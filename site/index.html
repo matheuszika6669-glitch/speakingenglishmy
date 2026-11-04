@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fala Inglês</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brandrow">
+      <div class="brand">Fala Inglês<small>trabalho + viagem</small></div>
+      <div class="row" id="hdr-right" style="gap:8px;flex-wrap:nowrap" hidden>
+        <select id="rate" aria-label="Velocidade da voz" style="width:auto;padding:4px 8px;font-size:.85rem"><option value="0">Voz normal</option><option value="1">Voz devagar</option><option value="2">Voz bem devagar</option></select>
+        <div class="streak" id="streak">0 dias</div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:4px"><span class="who" id="who"></span><button class="linkbtn" id="logout" type="button">Sair</button></div>
+    <nav class="tabs" id="tabs" aria-label="Seções" hidden>
+      <button data-v="hoje">Hoje</button>
+      <button data-v="falar">Falar</button>
+      <button data-v="frases">Frases</button>
+      <button data-v="escrever">Escrever</button>
+      <button data-v="historias">Histórias</button>
+      <button data-v="caderno">Caderno</button>
+      <button data-v="progresso">Progresso</button>
+    </nav>
+  </header>
+  <main id="app"></main>
+</div>
+<div id="toast" hidden></div>
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# nada de segredos: só a chave publishable vai no config.js (é pública)
+.env
+*.env
+*.token
+node_modules/

@@ -1,0 +1,617 @@
+<title>Fala Inglês</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Conceito: o dia de estudo é um cartão de embarque; cada atividade é um portão. Trabalho e viagem são as duas rotas. */
+:root{
+  --bg:#f1f5f9; --surface:#ffffff; --surface2:#e6edf4; --ink:#0d2236; --muted:#53697c; --line:#d0dbe5;
+  --accent:#1b5fc2; --accent-ink:#ffffff; --accent-soft:#dbe8fb; --warm:#c2410c; --warm-soft:#fde8dc;
+  --good:#16794a; --good-soft:#d9f2e4; --warn:#9a6700; --bad:#b42318; --bad-soft:#fde4e1;
+  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1520; --surface:#122232; --surface2:#1a2f43; --ink:#e8f0f7; --muted:#9bb0c2; --line:#2a425a;
+    --accent:#6ea8ff; --accent-ink:#08121c; --accent-soft:#17304f; --warm:#ff9a5c; --warm-soft:#3a2418;
+    --good:#5fd39a; --good-soft:#12362a; --warn:#f0c36a; --bad:#ff8f84; --bad-soft:#3d1c1a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1520; --surface:#122232; --surface2:#1a2f43; --ink:#e8f0f7; --muted:#9bb0c2; --line:#2a425a;
+  --accent:#6ea8ff; --accent-ink:#08121c; --accent-soft:#17304f; --warm:#ff9a5c; --warm-soft:#3a2418;
+  --good:#5fd39a; --good-soft:#12362a; --warn:#f0c36a; --bad:#ff8f84; --bad-soft:#3d1c1a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:1.45rem} h3{font-size:1.1rem}
+p{margin:0}
+button,textarea,input,select{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-top:12px;border-bottom:1px solid var(--line)}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.3rem;letter-spacing:-.01em}
+.brand small{font-family:var(--f-mono);font-weight:500;font-size:.68rem;color:var(--muted);margin-left:8px;letter-spacing:.06em;text-transform:uppercase}
+.streak{font-family:var(--f-mono);font-size:.8rem;background:var(--accent-soft);color:var(--accent);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.usage{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);text-align:right;margin-top:4px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:10px;padding-bottom:0;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:1 0 auto;background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px 9px;cursor:pointer;color:var(--muted);font-weight:700;white-space:nowrap}
+nav.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible,.btn:focus-visible,.icon:focus-visible,.chip:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{padding-top:20px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.label{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:.9rem}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.55;cursor:default}
+.icon{border:1px solid var(--line);background:var(--surface);border-radius:99px;min-width:36px;height:36px;padding:0 10px;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--accent)}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;cursor:pointer;font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+textarea,input[type=text],select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+textarea{min-height:92px;resize:vertical}
+.notice{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:.9rem;color:var(--muted)}
+.notice.warn{background:var(--warm-soft);color:var(--ink)}
+/* cartão de embarque */
+.pass{background:var(--surface);border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden}
+.pass-top{padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.route{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:1.6rem;letter-spacing:-.01em}
+.route span.arrow{flex:1;border-top:2px dashed var(--line);position:relative;min-width:24px}
+.route span.arrow::after{content:"✈";position:absolute;right:-2px;top:-14px;font-size:1rem;color:var(--accent)}
+.pass-meta{display:flex;gap:18px;flex-wrap:wrap}
+.pass-meta div{display:flex;flex-direction:column}
+.pass-meta b{font-family:var(--f-mono);font-weight:500;font-size:.95rem}
+.perf{position:relative;border-top:2px dashed var(--line);height:0}
+.perf::before,.perf::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
+.perf::before{left:-11px}.perf::after{right:-11px}
+.gates{list-style:none;margin:0;padding:6px 0}
+.gate{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.gate:last-child{border-bottom:0}
+.gcode{font-family:var(--f-mono);font-size:.78rem;background:var(--surface2);border-radius:6px;padding:4px 8px;white-space:nowrap}
+.gate.done .gcode{background:var(--good-soft);color:var(--good)}
+.gate .t{font-weight:700}
+.gate .s{font-size:.9rem;color:var(--muted)}
+.pill{font-family:var(--f-mono);font-size:.72rem;border-radius:99px;padding:3px 9px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+details.words{padding:0 18px 14px}
+details.words summary{cursor:pointer;color:var(--accent);font-weight:700;padding:4px 0}
+.wlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:8px}
+.w{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface2);border-radius:10px;padding:8px 10px}
+.w b{display:block}
+/* conversa */
+.log{display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:92%;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.bubble.them{background:var(--surface2);align-self:flex-start;border-top-left-radius:4px}
+.bubble.you{background:var(--accent-soft);align-self:flex-end;border-top-right-radius:4px}
+.fb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fb h4{margin:0;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.fix{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--warm-soft);border-radius:8px}
+del{color:var(--bad);text-decoration-thickness:2px}
+ins{color:var(--good);text-decoration:none;font-weight:700}
+.phr{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;background:var(--surface2);border-radius:10px}
+.phr .en{font-weight:700}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:8px 12px;cursor:pointer;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ok-w{color:var(--good);font-weight:700}.miss-w{color:var(--bad);text-decoration:underline wavy;font-weight:700}
+.big{font-family:var(--f-display);font-size:1.35rem;line-height:1.3}
+/* histórias */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left}
+.scard:hover{border-color:var(--accent)}
+.story p{margin-bottom:12px;max-width:65ch}
+.story{font-size:1.08rem}
+.gl{display:flex;flex-wrap:wrap;gap:8px}
+.gl span{background:var(--surface2);border-radius:8px;padding:4px 10px;font-size:.92rem}
+.score{font-family:var(--f-display);font-size:2.4rem;font-weight:700}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{width:22px;height:22px;border-radius:6px;background:var(--surface2)}
+.dot.on{background:var(--accent)}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat div{background:var(--surface2);border-radius:12px;padding:12px}
+.stat b{font-family:var(--f-display);font-size:1.7rem;display:block}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:40;max-width:90vw;font-size:.92rem}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+@media (max-width:520px){.brand small{display:none}.route{font-size:1.3rem}.gate{grid-template-columns:1fr auto}.gate .gcode{grid-column:1/-1;justify-self:start}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brandrow">
+      <div class="brand">Fala Inglês<small>trabalho + viagem</small></div>
+      <div class="row" style="gap:8px;flex-wrap:nowrap"><select id="rate" aria-label="Velocidade da voz" style="width:auto;padding:4px 8px;font-size:.85rem"><option value="0">Voz normal</option><option value="1">Voz devagar</option><option value="2">Voz bem devagar</option></select><div class="streak" id="streak">0 dias</div></div>
+    </div>
+    <div class="usage" id="usage"></div>
+    <nav class="tabs" id="tabs" aria-label="Seções">
+      <button data-v="hoje">Hoje</button>
+      <button data-v="conversar">Conversar</button>
+      <button data-v="frases">Frases</button>
+      <button data-v="historias">Histórias</button>
+      <button data-v="progresso">Progresso</button>
+    </nav>
+  </header>
+  <main id="app"></main>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+/* ---------- dados ---------- */
+var SCEN=[
+{id:'w1',kind:'work',title:'Reunião diária (stand-up)',role:'your team lead, Sam',opener:"Good morning! Let's start. What did you work on yesterday?",
+ phrases:[["Yesterday I worked on the monthly report.","Ontem eu trabalhei no relatório mensal."],["I'm waiting for feedback from the client.","Estou esperando o retorno do cliente."],["I ran into a problem with the invoice.","Tive um problema com a nota fiscal."],["I should be done by Thursday.","Devo terminar até quinta."],["Could you help me with this?","Você poderia me ajudar com isto?"]],
+ words:[["deadline","prazo"],["blocker","impedimento"],["update","atualização"],["on track","dentro do prazo"],["behind schedule","atrasado"],["to follow up","dar retorno"]]},
+{id:'w2',kind:'work',title:'Ligação com cliente',role:'a client named Ms. Taylor',opener:"Hello, thanks for joining the call. Can you tell me a little about your company?",
+ phrases:[["Thank you for taking the time to talk with me.","Obrigado por reservar um tempo para falar comigo."],["Could you repeat that, please?","Você poderia repetir, por favor?"],["Let me check and get back to you.","Deixe-me verificar e eu retorno para você."],["We can deliver it by the end of the month.","Podemos entregar até o fim do mês."],["I'll send you an email with the details.","Vou enviar um e-mail com os detalhes."]],
+ words:[["proposal","proposta"],["quote","orçamento"],["delivery","entrega"],["requirements","requisitos"],["contract","contrato"],["to schedule","agendar"]]},
+{id:'w3',kind:'work',title:'Negociar um prazo',role:'your manager, Alex',opener:"I need this project finished by Friday. Is that possible?",
+ phrases:[["I'm afraid Friday is too tight.","Receio que sexta seja apertado demais."],["Could we move the deadline to Monday?","Podemos mover o prazo para segunda?"],["If we get extra help, we can finish earlier.","Se tivermos ajuda extra, terminamos antes."],["I understand it's urgent.","Entendo que é urgente."],["Here is what I can do.","Aqui está o que eu posso fazer."]],
+ words:[["tight","apertado"],["urgent","urgente"],["priority","prioridade"],["workload","carga de trabalho"],["extension","prorrogação"],["realistic","realista"]]},
+{id:'w4',kind:'work',title:'Entrevista de emprego',role:'an interviewer named Jordan',opener:"Thanks for coming in today. Tell me a little about yourself.",
+ phrases:[["I have five years of experience in sales.","Tenho cinco anos de experiência em vendas."],["My biggest strength is organization.","Meu maior ponto forte é a organização."],["I'm looking for new challenges.","Estou buscando novos desafios."],["In my last job, I was responsible for the budget.","No meu último emprego, eu era responsável pelo orçamento."],["When would the position start?","Quando a vaga começaria?"]],
+ words:[["experience","experiência"],["strength","ponto forte"],["weakness","ponto fraco"],["skills","habilidades"],["salary","salário"],["to hire","contratar"]]},
+{id:'t1',kind:'travel',title:'Check-in no aeroporto',role:'an airline agent',opener:"Good afternoon. Where are you flying today? May I see your passport, please?",
+ phrases:[["I'd like to check in for my flight to London.","Gostaria de fazer o check-in do meu voo para Londres."],["I have one bag to check.","Tenho uma mala para despachar."],["Can I have a window seat, please?","Posso ficar na janela, por favor?"],["What time does boarding start?","A que horas começa o embarque?"],["Which gate is it?","Qual é o portão?"]],
+ words:[["boarding pass","cartão de embarque"],["luggage","bagagem"],["carry-on","bagagem de mão"],["delay","atraso"],["layover","escala"],["customs","alfândega"]]},
+{id:'t2',kind:'travel',title:'Check-in no hotel',role:'a hotel receptionist',opener:"Welcome! Do you have a reservation with us?",
+ phrases:[["I have a reservation under the name Silva.","Tenho uma reserva no nome Silva."],["Is breakfast included?","O café da manhã está incluso?"],["What time is check-out?","A que horas é o check-out?"],["Could I have a quiet room, please?","Poderia ser um quarto silencioso, por favor?"],["The air conditioning isn't working.","O ar-condicionado não está funcionando."]],
+ words:[["reservation","reserva"],["key card","cartão-chave"],["double room","quarto de casal"],["front desk","recepção"],["receipt","recibo"],["towel","toalha"]]},
+{id:'t3',kind:'travel',title:'Pedir em restaurante',role:'a waiter',opener:"Hi there! Are you ready to order, or do you need a few more minutes?",
+ phrases:[["Could we see the menu, please?","Podemos ver o cardápio, por favor?"],["I'll have the grilled chicken.","Vou querer o frango grelhado."],["Does this dish contain nuts?","Este prato tem nozes?"],["Could we have the check, please?","Podemos pedir a conta, por favor?"],["Everything was delicious.","Estava tudo delicioso."]],
+ words:[["menu","cardápio"],["appetizer","entrada"],["main course","prato principal"],["tip","gorjeta"],["allergy","alergia"],["bill","conta"]]},
+{id:'t4',kind:'travel',title:'Pedir direções',role:'a friendly local',opener:"Hi! You look a little lost. Can I help you?",
+ phrases:[["Excuse me, how do I get to the train station?","Com licença, como chego à estação de trem?"],["Is it far from here?","Fica longe daqui?"],["Could you show me on the map?","Você poderia me mostrar no mapa?"],["Should I turn left or right?","Devo virar à esquerda ou à direita?"],["How long does it take on foot?","Quanto tempo leva a pé?"]],
+ words:[["crossroads","cruzamento"],["straight ahead","em frente"],["block","quarteirão"],["corner","esquina"],["nearby","por perto"],["landmark","ponto de referência"]]}
+];
+var STORIES=[
+{id:'s1',kind:'travel',level:'A2',title:'The Missed Flight',
+ text:"Marco arrived at the airport at six o'clock. His flight to Lisbon was at seven. He went to the check-in desk, but the line was very long.\n\nWhen he finally reached the desk, the agent said, \"I'm sorry, sir. Check-in closed ten minutes ago.\" Marco felt terrible. He asked, \"Is there another flight today?\"\n\nThe agent checked her computer. \"Yes, there is one at nine in the evening. It costs eighty euros to change your ticket.\" Marco paid and sat down with a coffee. He wrote a message to his hotel: \"I will arrive late tonight. Please keep my room.\"\n\nNext time, he decided, he would leave home two hours earlier.",
+ gl:[["check-in desk","balcão de check-in"],["line","fila"],["agent","atendente"],["change your ticket","remarcar a passagem"],["keep my room","guardar meu quarto"]]},
+{id:'s2',kind:'travel',level:'A2',title:'A Hotel Mix-up',
+ text:"Ana booked a room with a sea view for her birthday trip. When she opened the door, she saw a parking lot through the window.\n\nShe went back to the front desk. \"Excuse me, I reserved a room with a sea view, but my window faces the parking lot,\" she said politely.\n\nThe manager looked at the computer and apologized. \"You are right. We made a mistake. I can move you to a bigger room on the sixth floor, and breakfast is free tomorrow.\"\n\nAna smiled. The new room had a balcony and a beautiful view of the ocean. She said thank you and took a photo for her family.",
+ gl:[["sea view","vista para o mar"],["to book","reservar"],["faces","dá para / é voltado para"],["to apologize","pedir desculpas"],["balcony","varanda"]]},
+{id:'s3',kind:'work',level:'B1',title:'The Big Meeting',
+ text:"Carla had to present the sales results to the whole company on Monday morning. She had practiced all weekend, so she felt ready.\n\nBut when she arrived, the projector would not turn on. The technician said it would take at least an hour to fix. Everyone was waiting.\n\nCarla took a deep breath and walked to the whiteboard. She drew a simple graph and explained the numbers step by step. Sales had grown by twelve percent, and the new customers in the south were the main reason.\n\nWhen she finished, her manager said, \"That was clear and confident. Let's approve the extra budget for next year.\" Carla realized that the problem had actually helped her.",
+ gl:[["sales results","resultados de vendas"],["projector","projetor"],["whiteboard","quadro branco"],["to grow by","crescer em"],["budget","orçamento"]]},
+{id:'s4',kind:'work',level:'B1',title:'A Difficult Client',
+ text:"On Tuesday, Daniel received an angry email from a client. The delivery was two weeks late, and the client wanted a full refund.\n\nDaniel wanted to answer by email, but he decided to call instead. \"Hello, Mr. Brooks. I'm very sorry about the delay. I would like to understand what happened on your side too,\" he said.\n\nThe client explained that he had lost an important sale because of the problem. Daniel listened without interrupting. Then he offered a fifteen percent discount and a new delivery date, with free shipping.\n\nAfter a short silence, Mr. Brooks said, \"All right. I appreciate that you called me.\" Daniel learned that a calm voice can solve more than a long email.",
+ gl:[["refund","reembolso"],["delay","atraso"],["to interrupt","interromper"],["discount","desconto"],["shipping","frete / envio"]]},
+{id:'s5',kind:'travel',level:'B1',title:'Lost in Lisbon',
+ text:"Tom was walking in Lisbon when his phone battery died. He had no map, and all the streets looked the same. He needed to find the tram stop to go back to his hotel.\n\nHe entered a small shop and asked the owner, \"Excuse me, could you tell me how to get to the tram stop on Rua Augusta?\"\n\nThe owner, an older woman, smiled. \"It's a bit complicated. Go straight, turn right at the church, and then take the second street on the left.\" Tom was still confused, so she closed the shop for ten minutes and walked with him to the corner.\n\nTom thanked her many times. That night, he told his friends that the best part of the trip was the kindness of strangers.",
+ gl:[["battery died","a bateria acabou"],["tram stop","ponto de bonde"],["complicated","complicado"],["confused","confuso"],["strangers","estranhos / desconhecidos"]]},
+{id:'s6',kind:'work',level:'A2',title:'The New Colleague',
+ text:"Sofia started her new job on Monday. She was nervous because everyone spoke English very fast.\n\nAt ten o'clock, she needed to print a document, but the printer did not work. She looked at the colleague at the next desk. \"Excuse me, could you help me with the printer, please?\" she asked.\n\nHis name was Bruno. He smiled and showed her which button to press. \"It's always a little slow in the morning,\" he said. Then he asked, \"Do you want to have lunch with us?\"\n\nAt lunch, Sofia met three more people from the team. They talked about their weekends and their favorite restaurants. By the afternoon, she felt much more comfortable.",
+ gl:[["nervous","nervosa"],["colleague","colega de trabalho"],["printer","impressora"],["to press","apertar"],["comfortable","à vontade"]]}
+];
+
+/* ---------- utilidades ---------- */
+function $(s,el){return (el||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function pad(n){return (n<10?'0':'')+n}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function dayNum(){var d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000)}
+var toastT;
+function toast(msg){var t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},3800)}
+function speak(text,slow){
+  if(!('speechSynthesis' in window)){toast('Este navegador não tem voz para ouvir as frases.');return}
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);u.lang='en-US';
+    var vs=speechSynthesis.getVoices();
+    var v=vs.filter(function(x){return /^en[-_]US/i.test(x.lang)})[0]||vs.filter(function(x){return /^en/i.test(x.lang)})[0];
+    if(v)u.voice=v;var base=[0.92,0.7,0.5][S.rate||0]||0.92;u.rate=slow?Math.min(base,0.6):base;speechSynthesis.speak(u);
+  }catch(e){toast('Não consegui reproduzir o áudio.')}
+}
+var MIC_TIP='O microfone não está liberado nesta página. Use o ditado do teclado em inglês: o botão de microfone do teclado no celular, ou Win+H no Windows.';
+/* Microfone: mesmo código da primeira versão (uma frase por vez). */
+function stopRec(){}
+function dictate(ta,btn){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast(MIC_TIP);return}
+  try{
+    var r=new SR();r.lang='en-US';r.interimResults=false;
+    r.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;ta.value=(ta.value?ta.value+' ':'')+t;btn.textContent='🎤 Falar'};
+    r.onerror=function(e){btn.textContent='🎤 Falar';toast('Código do erro: '+(e&&e.error||'desconhecido')+'. '+MIC_TIP)};
+    r.onend=function(){btn.textContent='🎤 Falar'};
+    btn.textContent='Ouvindo…';r.start();
+  }catch(e){toast(MIC_TIP)}
+}
+function norm(w){return w.toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9]/g,'')}
+function compare(target,said){
+  var t=target.split(/\s+/),tn=t.map(norm),sn=said.split(/\s+/).map(norm).filter(Boolean);
+  var n=tn.length,m=sn.length,dp=[],i,j;
+  for(i=0;i<=n;i++){dp.push(new Array(m+1).fill(0))}
+  for(i=1;i<=n;i++)for(j=1;j<=m;j++)dp[i][j]=tn[i-1]===sn[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  var hit=new Array(n).fill(false);i=n;j=m;
+  while(i>0&&j>0){if(tn[i-1]===sn[j-1]){hit[i-1]=true;i--;j--}else if(dp[i-1][j]>=dp[i][j-1])i--;else j--}
+  var ok=hit.filter(Boolean).length;
+  return {pct:n?Math.round(100*ok/n):0,html:t.map(function(w,k){return '<span class="'+(hit[k]?'ok-w':'miss-w')+'">'+esc(w)+'</span>'}).join(' ')};
+}
+
+/* ---------- estado e armazenamento ---------- */
+var LS='fala-ingles-v1';
+var S={days:{},notebook:[],stories:{},custom:[],updated:0};
+var dbDoc=null,saveT;
+try{var raw=localStorage.getItem(LS);if(raw){var p=JSON.parse(raw);if(p&&typeof p==='object')S=Object.assign(S,p)}}catch(e){}
+function save(){
+  S.updated=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){if(dbDoc){dbDoc.set(JSON.parse(JSON.stringify(S))).catch(function(){})}},700);
+}
+function today(){var k=ymd(new Date());if(!S.days[k])S.days[k]={talk:0,rep:0,repList:[],words:false,story:false};return S.days[k]}
+function anyActivity(d){return d&&(d.talk>0||d.rep>0||d.words||d.story)}
+function streak(){
+  var d=new Date(),n=0;
+  if(!anyActivity(S.days[ymd(d)]))d.setDate(d.getDate()-1);
+  while(anyActivity(S.days[ymd(d)])){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+function allStories(){return STORIES.concat(S.custom)}
+function addPhrase(en,pt,src){
+  if(!en)return false;
+  if(S.notebook.some(function(x){return x.en.toLowerCase()===en.toLowerCase()})){toast('Já está no seu caderno.');return false}
+  S.notebook.unshift({en:en,pt:pt||'',src:src||''});save();toast('Salvo no caderno.');return true;
+}
+
+/* ---------- correção grátis (sem Claude) ---------- */
+/* Pontos-chave de cada história: a conferência grátis procura estas palavras no resumo. */
+var KP={
+ s1:[{pt:'Marco foi ao aeroporto e a fila estava grande',kw:['line','queue','long','airport']},{pt:'O check-in já tinha fechado',kw:['closed','close','late','missed','miss']},{pt:'Ele pagou 80 euros para trocar para o voo das 9',kw:['eighty','80','nine','euro','paid','pay','change','another flight']},{pt:'Avisou o hotel que chegaria tarde',kw:['hotel','message','room']},{pt:'Decidiu sair de casa mais cedo da próxima vez',kw:['earlier','next time','decid']}],
+ s2:[{pt:'Ana reservou um quarto com vista para o mar',kw:['sea view','sea','ocean','booked','reserved']},{pt:'A janela dava para o estacionamento',kw:['parking']},{pt:'Ela reclamou educadamente na recepção',kw:['front desk','manager','polite','complain','asked']},{pt:'O gerente pediu desculpas e ofereceu um quarto maior no sexto andar',kw:['apolog','bigger','sixth','move']},{pt:'Café da manhã grátis e a nova varanda com vista',kw:['breakfast','free','balcony','view']}],
+ s3:[{pt:'Carla ia apresentar os resultados de vendas',kw:['present','sales','results']},{pt:'O projetor não ligou',kw:['projector']},{pt:'Ela usou o quadro branco e explicou',kw:['whiteboard','board','graph','drew','draw']},{pt:'As vendas cresceram 12% por causa dos clientes do sul',kw:['twelve','12','percent','south','grew','grow']},{pt:'O gerente aprovou o orçamento extra',kw:['budget','approve']}],
+ s4:[{pt:'O cliente mandou um e-mail bravo: entrega atrasada e pediu reembolso',kw:['angry','email','refund','late','delay']},{pt:'Daniel ligou em vez de responder por e-mail',kw:['call','phone','instead']},{pt:'Pediu desculpas e ouviu sem interromper',kw:['sorry','apolog','listen','interrupt']},{pt:'Ofereceu 15% de desconto, nova data e frete grátis',kw:['fifteen','15','discount','shipping','date']},{pt:'O cliente aceitou e agradeceu a ligação',kw:['appreciate','accept','agree','all right','thank','okay']}],
+ s5:[{pt:'A bateria do celular de Tom acabou em Lisboa',kw:['battery','phone','died','lisbon']},{pt:'Ele perguntou o caminho do bonde numa loja',kw:['shop','owner','asked','tram','direction']},{pt:'A dona explicou: reto, direita na igreja, segunda rua à esquerda',kw:['church','straight','left','right','street']},{pt:'Como ele ficou confuso, ela fechou a loja e o acompanhou',kw:['confus','closed','walked','walk','corner']},{pt:'Tom achou a gentileza de estranhos a melhor parte',kw:['kind','strangers','best part','friends']}],
+ s6:[{pt:'Sofia começou no emprego novo e estava nervosa',kw:['first','new job','nervous','started','start']},{pt:'A impressora não funcionava e ela pediu ajuda',kw:['printer','help','asked']},{pt:'Bruno mostrou o botão e disse que era lenta de manhã',kw:['bruno','button','slow','press','showed','show']},{pt:'Ele a convidou para almoçar',kw:['lunch','invite']},{pt:'Conheceu mais pessoas e se sentiu à vontade',kw:['met','team','comfortable','people','welcome']}]
+};
+var TP={have:'has',do:'does',go:'goes',work:'works',need:'needs',want:'wants',like:'likes',live:'lives',study:'studies',make:'makes',take:'takes',know:'knows',think:'thinks',say:'says',get:'gets',use:'uses'};
+var PAST={went:'go',saw:'see',had:'have',ate:'eat',came:'come',took:'take',made:'make',got:'get',said:'say',bought:'buy',knew:'know'};
+var OBJ={you:'you',he:'him',she:'her',we:'us',they:'them'};
+function cap(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}
+var RULES=[
+ [/\bI have (\d+) years?\b(?! of)/gi,function(m){return {said:m[0],better:'I am '+m[1]+' years old',why:'Idade em inglês usa o verbo "to be" (I am), não "have".'}}],
+ [/\b(?:I am|I'm) agree\b/gi,function(m){return {said:m[0],better:'I agree',why:'"Agree" já é verbo: não use "am" antes.'}}],
+ [/\bmore (better|worse)\b/gi,function(m){return {said:m[0],better:m[1],why:'"'+m[1]+'" já é comparativo; não precisa de "more".'}}],
+ [/\bdepends? of\b/gi,function(m){return {said:m[0],better:m[0].replace(/of$/i,'on'),why:'Em inglês é "depend on".'}}],
+ [/\bmake (?:a|the) questions?\b/gi,function(m){return {said:m[0],better:'ask a question',why:'Pergunta se faz com "ask", não com "make".'}}],
+ [/\bsince (\d+|a|an|two|three|four|five|six|seven|eight|nine|ten) (years?|months?|weeks?|days?|hours?)\b/gi,function(m){return {said:m[0],better:'for '+m[1]+' '+m[2],why:'Duração usa "for". "Since" é para um ponto no tempo (since 2020).'}}],
+ [/\b(?:I|you|we|they) (?:didn't|did not|don't|do not|can't|cannot|couldn't|won't) (went|saw|had|ate|came|took|made|got|said|bought|knew)\b/gi,function(m){var v=m[1].toLowerCase();return {said:m[0],better:m[0].replace(new RegExp(m[1]+'$','i'),PAST[v]),why:'Depois de did not, don\'t, can\'t etc., o verbo fica no infinitivo.'}}],
+ [/\b(he|she|it) (have|do|go|work|need|want|like|live|study|make|take|know|think|say|get|use)\b/gi,function(m){return {said:m[0],better:m[1]+' '+TP[m[2].toLowerCase()],why:'Com he/she/it, o verbo no presente leva -s (he works).'}}],
+ [/\b(I) (is|are)\b/g,function(m){return {said:m[0],better:'I am',why:'Com "I" usa-se "am".'}}],
+ [/\b(he|she|it) are\b/gi,function(m){return {said:m[0],better:m[1]+' is',why:'Com he/she/it usa-se "is".'}}],
+ [/\b(we|they|you) is\b/gi,function(m){return {said:m[0],better:m[1]+' are',why:'Com we/they/you usa-se "are".'}}],
+ [/\b(can|could|should|must|will|would) to (\w+)/gi,function(m){return {said:m[0],better:m[1]+' '+m[2],why:'Depois de can, could, should, must, will e would não se usa "to".'}}],
+ [/\b(informations|advices|furnitures|knowledges|equipments)\b/gi,function(m){return {said:m[0],better:m[0].slice(0,-1),why:'Substantivo incontável: não tem plural.'}}],
+ [/\bin (monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi,function(m){return {said:m[0],better:'on '+cap(m[1]),why:'Dias da semana usam "on".'}}],
+ [/\bI want that (you|he|she|we|they)\b/gi,function(m){return {said:m[0],better:'I want '+OBJ[m[1].toLowerCase()]+' to',why:'Em inglês: want + pessoa + to + verbo.'}}],
+ [/\bhow much (people|friends|books|years|days|times|students|clients)\b/gi,function(m){return {said:m[0],better:'how many '+m[1],why:'Coisas contáveis usam "many".'}}],
+ [/\bthe people is\b/gi,function(m){return {said:m[0],better:'the people are',why:'"People" é plural.'}}],
+ [/\ba ([aeiou]\w*)/gi,function(m){if(/^(uni|use|usu|one|eu)/i.test(m[1]))return null;return {said:m[0],better:'an '+m[1],why:'Antes de som de vogal usa-se "an".'}}]
+];
+function quickCheck(t){
+  var out=[],seen={};
+  RULES.forEach(function(r){
+    var m,re=new RegExp(r[0].source,r[0].flags);
+    while((m=re.exec(t))){var x=r[1](m);if(x&&!seen[x.said+x.better]){seen[x.said+x.better]=1;out.push(x)}if(m.index===re.lastIndex)re.lastIndex++}
+  });
+  return out.slice(0,8);
+}
+function issuesHTML(list){
+  if(!list.length)return '<div class="notice">Não achei erros comuns. A checagem grátis só pega uns 20 erros típicos de brasileiros e não entende o sentido da frase. Para uma correção completa, envie ao Claude.</div>';
+  return '<div class="fb"><h4>Erros comuns encontrados (grátis)</h4>'+list.map(function(m){return '<div class="fix"><div><del>'+esc(m.said)+'</del> → <ins>'+esc(m.better)+'</ins></div><div class="small muted">'+esc(m.why)+'</div></div>'}).join('')+'</div>';
+}
+function showQuick(src,box){
+  var t=$('#'+src).value.trim();if(!t){toast('Escreva algo primeiro.');return}
+  $('#'+box).innerHTML=issuesHTML(quickCheck(t));
+  today().talk+=0;
+}
+function freeSummary(){
+  var ta=$('#sum'),text=ta.value.trim();if(!text){toast('Escreva o resumo primeiro.');return}
+  stopRec();
+  var st=allStories().filter(function(x){return x.id===openStory})[0],kp=st&&(st.kp&&st.kp.length?st.kp:KP[st.id]);
+  var box=$('#evres');
+  if(!kp){box.innerHTML=issuesHTML(quickCheck(text))+'<div class="notice" style="margin-top:8px">Esta história não tem pontos-chave para a conferência grátis. Use a validação com o Claude.</div>';return}
+  var low=text.toLowerCase(),cov=[],mis=[];
+  kp.forEach(function(p){(p.kw.some(function(w){return low.indexOf(w)>=0})?cov:mis).push(p.pt)});
+  var score=Math.round(10*cov.length/kp.length),prev=S.stories[openStory];
+  if(!prev||prev.free){S.stories[openStory]={score:score,date:ymd(new Date()),free:true}}
+  today().story=true;save();render_header();
+  box.innerHTML='<div class="fb"><div class="row" style="justify-content:space-between"><div><div class="label">Nota estimada (grátis)</div><div class="score">'+score+'<span class="muted" style="font-size:1rem">/10</span></div></div><div style="flex:1 1 220px" class="small muted">Só confere se as ideias principais aparecem no seu texto, procurando palavras-chave. Não avalia o sentido nem a gramática: para isso, use o Claude.</div></div>'+
+   (cov.length?'<div><h4>Ideias que apareceram</h4><ul>'+cov.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>':'')+
+   (mis.length?'<div><h4>Ideias que parecem faltar</h4><ul>'+mis.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>':'')+'</div>'+issuesHTML(quickCheck(text));
+}
+
+/* ---------- Claude ---------- */
+var sample=null;
+function showUsage(){var n=(S.usage&&S.usage[ymd(new Date())])||0;$('#usage').textContent='Chamadas ao Claude hoje: '+n+' (ouvir, conferir frases e checagem rápida não contam)'}
+function ask(prompt){
+  if(!sample)return Promise.reject({code:'unavailable'});
+  if(!S.usage)S.usage={};
+  var k=ymd(new Date());S.usage[k]=(S.usage[k]||0)+1;save();showUsage();
+  return sample.json(prompt,{cache:false});
+}
+function errMsg(e){
+  var c=e&&e.code;
+  if(c==='cancelled')return '';
+  if(c==='not_granted')return 'Permita que esta página use o Claude para corrigir.';
+  if(c==='rate_limited')return 'Muitas perguntas seguidas. Espere um instante e tente de novo.';
+  if(c==='invalid_json')return 'A resposta do Claude veio incompleta. Tente de novo.';
+  if(c==='unavailable')return 'A correção só funciona abrindo este link no claude.ai, com a sua conta.';
+  return 'Não consegui falar com o Claude agora ('+(c||'erro')+').';
+}
+function arr(x){return Array.isArray(x)?x:[]}
+var LEARNER='a Brazilian Portuguese speaker at level A2-B1 who needs English for work and travel and struggles with speaking, vocabulary and building sentences';
+
+/* ---------- roteamento ---------- */
+var view='hoje',convo=null,mode='reply',deck='hoje',practice=null,openStory=null,busy=false,lastEval=null,helpRes=null;
+function go(v){view=v;try{history.replaceState(null,'','#'+v)}catch(e){}render();window.scrollTo(0,0)}
+function render(){
+  stopRec();$('#rate').value=String(S.rate||0);showUsage();
+  Array.prototype.forEach.call($('#tabs').children,function(b){if(b.dataset.v===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  var n=streak();$('#streak').textContent=n+(n===1?' dia seguido':' dias seguidos');
+  ({hoje:vHoje,conversar:vConversar,frases:vFrases,historias:vHistorias,progresso:vProgresso})[view]();
+}
+
+/* ---------- HOJE ---------- */
+function todayScen(){return SCEN[dayNum()%SCEN.length]}
+function todayStory(){var a=allStories();return a[dayNum()%a.length]}
+function gate(code,done,title,sub,btn,act,extra){
+  return '<li class="gate'+(done?' done':'')+'"><span class="gcode">'+code+'</span><div><div class="t">'+title+'</div><div class="s">'+sub+'</div></div><div class="row">'+
+    '<span class="pill'+(done?' ok':'')+'">'+(done?'feito':'pendente')+'</span>'+(btn?'<button class="btn'+(done?'':' primary')+'" data-act="'+act+'" '+(extra||'')+'>'+btn+'</button>':'')+'</div></li>';
+}
+function vHoje(){
+  var sc=todayScen(),st=todayStory(),d=today(),dt=new Date();
+  var done=[d.talk>=3,d.rep>=5,d.words,d.story],nd=done.filter(Boolean).length;
+  var months=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  var wl=sc.words.map(function(w){return '<div class="w"><div><b>'+esc(w[0])+'</b><span class="muted small">'+esc(w[1])+'</span></div><button class="icon" data-act="say" data-t="'+esc(w[0])+'" aria-label="Ouvir '+esc(w[0])+'">▶</button></div>'}).join('');
+  $('#app').innerHTML=
+   '<section class="pass" aria-label="Plano de hoje">'+
+    '<div class="pass-top"><div class="label">Cartão de embarque · estudo de hoje</div>'+
+     '<div class="route"><span>VOCÊ</span><span class="arrow"></span><span>'+(sc.kind==='work'?'TRABALHO':'VIAGEM')+'</span></div>'+
+     '<div class="pass-meta"><div><span class="label">Data</span><b>'+dt.getDate()+' '+months[dt.getMonth()]+'</b></div><div><span class="label">Cenário</span><b>'+esc(sc.title)+'</b></div><div><span class="label">Portões</span><b>'+nd+'/4</b></div></div></div>'+
+    '<div class="perf"></div>'+
+    '<ul class="gates">'+
+      gate('GATE 1',done[0],'Conversa: '+esc(sc.title),'Troque 3 mensagens com '+esc(sc.role)+'. Já fez '+Math.min(d.talk,3)+'/3.','Conversar','goto','data-v="conversar" data-sid="'+sc.id+'"')+
+      gate('GATE 2',done[1],'Repetir 5 frases','Ouça, fale e confira. Já repetiu '+Math.min(d.rep,5)+'/5.','Praticar','goto','data-v="frases"')+
+      gate('GATE 3',done[2],'6 palavras do dia','Vocabulário do cenário de hoje (abaixo).',done[2]?'':'Já estudei','words')+
+      gate('GATE 4',done[3],'História: '+esc(st.title),'Leia, escreva um resumo e receba a correção.','Ler','goto','data-v="historias" data-story="'+st.id+'"')+
+    '</ul>'+
+    '<details class="words"'+(done[2]?'':' open')+'><summary>Palavras de hoje</summary><div class="wlist">'+wl+'</div></details>'+
+   '</section>'+
+   '<div class="notice">Como funciona o áudio: o Claude lê o que você escreve ou dita e corrige gramática, vocabulário e naturalidade. Ele não escuta a sua pronúncia. Para treinar a fala, use o ouvir (▶) e repita em voz alta.</div>';
+}
+
+/* ---------- CONVERSAR ---------- */
+function startConvo(sid){var sc=SCEN.filter(function(x){return x.id===sid})[0]||SCEN[0];convo={sid:sc.id,turns:[{who:'them',text:sc.opener,pt:''}]}}
+function vConversar(){
+  if(!convo)startConvo(todayScen().id);
+  var chips=SCEN.map(function(s){return '<button class="chip" data-act="scen" data-sid="'+s.id+'" aria-pressed="'+(s.id===convo.sid)+'">'+(s.kind==='work'?'💼 ':'✈️ ')+esc(s.title)+'</button>'}).join('');
+  var sc=SCEN.filter(function(x){return x.id===convo.sid})[0];
+  $('#app').innerHTML=
+   '<div class="card"><div class="label">Escolha a situação</div><div class="row">'+chips+'</div>'+
+    '<p class="small muted">Você fala com <b>'+esc(sc.role)+'</b>. Responda em inglês. Se travar, troque para &ldquo;Como digo isso?&rdquo; e escreva em português.</p></div>'+
+   '<div class="log" id="log"></div>'+
+   '<div class="card" id="composer">'+
+    '<div class="seg" role="group" aria-label="Modo"><button data-act="mode" data-m="reply" aria-pressed="'+(mode==='reply')+'">Responder em inglês</button><button data-act="mode" data-m="help" aria-pressed="'+(mode==='help')+'">Como digo isso?</button></div>'+
+    '<label class="label" for="say">'+(mode==='reply'?'Sua resposta (inglês, ou misture com português)':'O que você quer dizer (em português)')+'</label>'+
+    '<textarea id="say" placeholder="'+(mode==='reply'?'Type or dictate your answer…':'Ex.: quero pedir para trocar meu quarto porque o ar não funciona')+'"></textarea>'+
+    '<div class="row">'+(mode==='reply'?'<button class="btn" data-act="mic" id="micbtn">🎤 Falar</button><button class="btn" data-act="quick">Checagem rápida (grátis)</button>':'')+
+    '<button class="btn primary" data-act="'+(mode==='reply'?'send':'help')+'" id="sendbtn">'+(mode==='reply'?'Enviar e corrigir':'Me ajude a dizer')+'</button></div>'+
+    '<div id="quick"></div><div id="helpbox"></div></div>';
+  drawLog();drawHelp();
+}
+function fbHTML(fb){
+  var h='<div class="fb">';
+  if(fb.natural){h+='<div><h4>Soa mais natural assim</h4><div class="row" style="justify-content:space-between"><b>'+esc(fb.natural)+'</b><span class="row"><button class="icon" data-act="say" data-t="'+esc(fb.natural)+'" aria-label="Ouvir">▶</button><button class="icon" data-act="say" data-slow="1" data-t="'+esc(fb.natural)+'" aria-label="Ouvir devagar">🐢</button></span></div></div>'}
+  if(fb.good)h+='<div class="small"><b>Foi bem:</b> '+esc(fb.good)+'</div>';
+  var mk=arr(fb.mistakes);
+  if(mk.length){h+='<div><h4>Para corrigir</h4><div style="display:flex;flex-direction:column;gap:6px">'+mk.map(function(m){return '<div class="fix"><div><del>'+esc(m.said)+'</del> → <ins>'+esc(m.better)+'</ins></div><div class="small muted">'+esc(m.why)+'</div></div>'}).join('')+'</div></div>'}
+  else if(fb.understood!==false){h+='<div class="small" style="color:var(--good)"><b>Sem erros relevantes.</b></div>'}
+  var ln=arr(fb.learn);
+  if(ln.length){h+='<div><h4>Para falar melhor da próxima vez</h4><div style="display:flex;flex-direction:column;gap:6px">'+ln.map(function(l){return '<div class="phr"><div><div class="en">'+esc(l.en)+'</div><div class="small muted">'+esc(l.pt)+(l.example?' · '+esc(l.example):'')+'</div></div><span class="row"><button class="icon" data-act="say" data-t="'+esc(l.en)+'" aria-label="Ouvir">▶</button><button class="icon" data-act="add" data-en="'+esc(l.en)+'" data-pt="'+esc(l.pt)+'" aria-label="Salvar no caderno">＋</button></span></div>'}).join('')+'</div></div>'}
+  var rp=arr(fb.repeat);
+  if(rp.length){h+='<div><h4>Repita em voz alta</h4><div style="display:flex;flex-direction:column;gap:6px">'+rp.map(function(r){return '<div class="phr"><span class="en">'+esc(r)+'</span><span class="row"><button class="icon" data-act="say" data-t="'+esc(r)+'" aria-label="Ouvir">▶</button><button class="icon" data-act="add" data-en="'+esc(r)+'" data-pt="" aria-label="Salvar no caderno">＋</button></span></div>'}).join('')+'</div></div>'}
+  return h+'</div>';
+}
+function drawLog(){
+  var el=$('#log');if(!el||!convo)return;
+  el.innerHTML=convo.turns.map(function(t){
+    if(t.who==='them')return '<div class="bubble them"><div>'+esc(t.text)+'</div><div class="row"><button class="icon" data-act="say" data-t="'+esc(t.text)+'" aria-label="Ouvir">▶</button>'+(t.pt?'<span class="small muted">'+esc(t.pt)+'</span>':'')+'</div></div>';
+    return '<div class="bubble you">'+esc(t.text)+'</div>'+(t.fb?fbHTML(t.fb):'')+(t.pending?'<div class="muted small"><span class="spin"></span>Claude está corrigindo…</div>':'')+(t.err?'<div class="notice warn">'+esc(t.err)+'</div>':'');
+  }).join('');
+}
+function drawHelp(){
+  var el=$('#helpbox');if(!el)return;
+  if(mode!=='help'||!helpRes){el.innerHTML='';return}
+  var h=helpRes;
+  el.innerHTML='<div class="fb">'+arr(h.options).map(function(o){return '<div class="phr"><div><div class="en">'+esc(o.en)+'</div><div class="small muted">'+esc(o.tone)+(o.note?' · '+esc(o.note):'')+'</div></div><span class="row"><button class="icon" data-act="say" data-t="'+esc(o.en)+'" aria-label="Ouvir">▶</button><button class="icon" data-act="add" data-en="'+esc(o.en)+'" data-pt="" aria-label="Salvar">＋</button><button class="btn" data-act="use" data-en="'+esc(o.en)+'">Usar</button></span></div>'}).join('')+
+    (h.pronunciation?'<div class="small"><b>Pronúncia:</b> '+esc(h.pronunciation)+'</div>':'')+
+    (arr(h.key_words).length?'<div class="gl">'+arr(h.key_words).map(function(k){return '<span>'+esc(k.en)+' = '+esc(k.pt)+'</span>'}).join('')+'</div>':'')+'</div>';
+}
+function setBusy(on,id,label){busy=on;var b=$(id);if(b){b.disabled=on;b.innerHTML=on?'<span class="spin"></span>'+label:b.dataset.label||b.innerHTML}}
+function sendTurn(){
+  stopRec();
+  var ta=$('#say'),text=ta.value.trim();if(!text||busy)return;
+  var sc=SCEN.filter(function(x){return x.id===convo.sid})[0];
+  var hist=convo.turns.slice(-8).map(function(t){return (t.who==='them'?'Partner: ':'Learner: ')+t.text}).join('\n');
+  var turn={who:'you',text:text,pending:true};convo.turns.push(turn);ta.value='';drawLog();
+  busy=true;var sb=$('#sendbtn');if(sb)sb.disabled=true;
+  var prompt='You are a warm, encouraging English speaking coach for '+LEARNER+'.\nRole-play scenario: "'+sc.title+'". You play: '+sc.role+'.\nConversation so far:\n'+hist+'\n\nThe learner just said (it may be typed or a speech-to-text transcript, so ignore capitalization and punctuation, and they may mix in Portuguese words): "'+text+'"\n\nReply with ONLY one JSON object with these keys:\n"understood": true/false (could a native speaker understand it),\n"natural": the learner\'s sentence rewritten the way a native speaker would naturally say it, same meaning, simple words,\n"mistakes": array (max 3) of {"said": exact wrong part, "better": the fix, "why": short explanation in Brazilian Portuguese}; empty array if fine,\n"good": one specific thing they did well, in Brazilian Portuguese (short),\n"learn": array (max 3) of {"en": useful word or phrase they were missing, "pt": tradução, "example": a short example sentence in English},\n"repeat": array of 2 or 3 short English sentences (max 10 words each) for the learner to practice aloud, based on this turn,\n"reply": your next line in character, 1 to 3 short sentences in simple English that continues the conversation with a question,\n"reply_pt": Brazilian Portuguese translation of your reply.';
+  ask(prompt).then(function(fb){
+    turn.pending=false;turn.fb=fb||{};
+    convo.turns.push({who:'them',text:(fb&&fb.reply)||'Could you say that again?',pt:(fb&&fb.reply_pt)||''});
+    today().talk++;save();
+  }).catch(function(e){turn.pending=false;turn.err=errMsg(e)||'Cancelado.'}).then(function(){
+    busy=false;var b=$('#sendbtn');if(b)b.disabled=false;drawLog();render_header();
+    var l=$('#log');if(l&&l.lastElementChild)l.lastElementChild.scrollIntoView({block:'nearest',behavior:'smooth'});
+  });
+}
+function render_header(){var n=streak();$('#streak').textContent=n+(n===1?' dia seguido':' dias seguidos')}
+function helpMe(){
+  stopRec();
+  var ta=$('#say'),text=ta.value.trim();if(!text||busy)return;
+  var sc=SCEN.filter(function(x){return x.id===convo.sid})[0];
+  busy=true;var b=$('#sendbtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Pensando…';
+  var prompt='You help '+LEARNER+'. Scenario: "'+sc.title+'" (talking to '+sc.role+'). The learner wants to say this, in Portuguese: "'+text+'"\n\nReply with ONLY one JSON object: {"options": array of 3 objects {"en": a natural, simple English sentence they can say, "tone": one of "formal","neutro","informal", "note": very short tip in Brazilian Portuguese}, "pronunciation": one short tip in Brazilian Portuguese about the hardest sound or word stress in the best option (use Portuguese-style respelling for 1 or 2 words), "key_words": array of up to 4 {"en","pt"} important words used}.';
+  ask(prompt).then(function(r){helpRes=r}).catch(function(e){toast(errMsg(e)||'Cancelado.')}).then(function(){busy=false;b.disabled=false;b.textContent='Me ajude a dizer';drawHelp()});
+}
+
+/* ---------- FRASES ---------- */
+function deckList(){return deck==='hoje'?todayScen().phrases.map(function(p){return {en:p[0],pt:p[1]}}):S.notebook}
+function vFrases(){
+  var list=deckList();
+  var pr='';
+  if(practice){
+    pr='<div class="card"><div class="label">Pratique esta frase</div><div class="big">'+esc(practice.en)+'</div>'+(practice.pt?'<div class="muted">'+esc(practice.pt)+'</div>':'')+
+     '<div class="row"><button class="btn" data-act="say" data-t="'+esc(practice.en)+'">▶ Ouvir</button><button class="btn" data-act="say" data-slow="1" data-t="'+esc(practice.en)+'">🐢 Devagar</button></div>'+
+     '<label class="label" for="rep">Agora diga em voz alta e escreva (ou dite) o que você disse</label><textarea id="rep" style="min-height:64px"></textarea>'+
+     '<div class="row"><button class="btn" data-act="mic" id="micbtn">🎤 Falar</button><button class="btn primary" data-act="check">Conferir</button></div><div id="repres"></div></div>';
+  }
+  var rows=list.length?list.map(function(p,i){return '<div class="phr"><div><div class="en">'+esc(p.en)+'</div>'+(p.pt?'<div class="small muted">'+esc(p.pt)+'</div>':'')+'</div><span class="row"><button class="icon" data-act="say" data-t="'+esc(p.en)+'" aria-label="Ouvir">▶</button><button class="btn" data-act="prac" data-i="'+i+'">Praticar</button>'+(deck==='caderno'?'<button class="icon" data-act="del" data-i="'+i+'" aria-label="Remover">✕</button>':'<button class="icon" data-act="add" data-en="'+esc(p.en)+'" data-pt="'+esc(p.pt)+'" aria-label="Salvar no caderno">＋</button>')+'</span></div>'}).join(''):'<p class="muted">Seu caderno está vazio. Converse, leia histórias ou peça frases abaixo, e salve com ＋.</p>';
+  $('#app').innerHTML=
+   '<div class="card"><div class="row"><div class="seg"><button data-act="deck" data-d="hoje" aria-pressed="'+(deck==='hoje')+'">Frases de hoje</button><button data-act="deck" data-d="caderno" aria-pressed="'+(deck==='caderno')+'">Meu caderno ('+S.notebook.length+')</button></div></div></div>'+
+   pr+
+   '<div class="card"><div class="label">'+(deck==='hoje'?'Cenário: '+esc(todayScen().title):'Frases salvas')+'</div><div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div></div>'+
+   '<div class="card"><div class="label">Pedir frases novas ao Claude</div><label for="topic" class="small muted">Sobre o quê? Ex.: pedir um desconto, remarcar reunião, perder a conexão</label><input type="text" id="topic" placeholder="Assunto ou situação"><div class="row"><button class="btn primary" data-act="gen" id="genbtn">Gerar 6 frases</button></div><div id="genres" style="display:flex;flex-direction:column;gap:8px"></div></div>';
+}
+function checkRep(){
+  stopRec();
+  var ta=$('#rep'),said=ta.value.trim();if(!said||!practice)return;
+  var r=compare(practice.en,said),d=today();
+  if(r.pct>=85&&d.repList.indexOf(practice.en)<0){d.repList.push(practice.en);d.rep=d.repList.length;save();render_header()}
+  $('#repres').innerHTML='<div class="notice"><b>'+r.pct+'% das palavras batem.</b> '+(r.pct>=85?'Boa! Conta como repetida hoje.':'Ouça de novo e tente outra vez.')+'<div style="margin-top:6px">'+r.html+'</div></div>';
+}
+function genPhrases(){
+  var tp=$('#topic').value.trim();if(!tp||busy)return;
+  busy=true;var b=$('#genbtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Gerando…';
+  var prompt='Give 6 useful, natural English sentences for '+LEARNER+', about: "'+tp+'". Short (max 12 words), practical for real work or travel situations. Reply with ONLY a JSON array of {"en": sentence, "pt": Brazilian Portuguese translation}.';
+  ask(prompt).then(function(a){
+    a=arr(a);$('#genres').innerHTML=a.map(function(p){return '<div class="phr"><div><div class="en">'+esc(p.en)+'</div><div class="small muted">'+esc(p.pt)+'</div></div><span class="row"><button class="icon" data-act="say" data-t="'+esc(p.en)+'" aria-label="Ouvir">▶</button><button class="icon" data-act="add" data-en="'+esc(p.en)+'" data-pt="'+esc(p.pt)+'" aria-label="Salvar">＋</button></span></div>'}).join('');
+  }).catch(function(e){toast(errMsg(e)||'Cancelado.')}).then(function(){busy=false;b.disabled=false;b.textContent='Gerar 6 frases'});
+}
+
+/* ---------- HISTÓRIAS ---------- */
+function vHistorias(){
+  var a=allStories();
+  if(openStory){var st=a.filter(function(x){return x.id===openStory})[0];if(st)return readStory(st);openStory=null}
+  var cards=a.map(function(s){var r=S.stories[s.id];return '<button class="scard" data-act="open" data-id="'+s.id+'"><span class="label">'+(s.kind==='work'?'Trabalho':'Viagem')+' · '+esc(s.level)+(r?' · nota '+r.score+'/10':'')+'</span><h3>'+esc(s.title)+'</h3><span class="small muted">'+Math.max(1,Math.round(s.text.split(/\s+/).length/110))+' min de leitura</span></button>'}).join('');
+  $('#app').innerHTML='<div class="card"><h2>Biblioteca de histórias</h2><p class="muted">Leia, ouça, escreva um resumo em inglês e o Claude confere se você entendeu certo e corrige o texto.</p></div><div class="grid">'+cards+'</div>'+
+   '<div class="card"><div class="label">Criar uma história nova</div><div class="row"><input type="text" id="stopic" placeholder="Tema (ex.: um atraso de voo, uma reunião difícil)" style="flex:1 1 220px"><select id="slevel" style="flex:0 0 120px"><option>A2</option><option selected>B1</option><option>B2</option></select></div><div class="row"><button class="btn primary" data-act="newstory" id="nsbtn">Gerar história</button></div></div>';
+}
+function readStory(st){
+  var paras=st.text.split(/\n\n+/).map(function(p){return '<p>'+esc(p)+'</p>'}).join('');
+  var r=S.stories[st.id];
+  $('#app').innerHTML=
+   '<div class="row"><button class="btn" data-act="back">← Biblioteca</button></div>'+
+   '<div class="card"><div class="label">'+(st.kind==='work'?'Trabalho':'Viagem')+' · nível '+esc(st.level)+'</div><h2>'+esc(st.title)+'</h2>'+
+    '<div class="row"><button class="btn" data-act="say" data-t="'+esc(st.text.replace(/\n+/g,' '))+'">▶ Ouvir a história</button><button class="btn" data-act="say" data-slow="1" data-t="'+esc(st.text.replace(/\n+/g,' '))+'">🐢 Devagar</button></div>'+
+    '<div class="story">'+paras+'</div>'+
+    '<div><div class="label">Vocabulário</div><div class="gl" style="margin-top:6px">'+arr(st.gl).map(function(g){return '<span>'+esc(g[0])+' = '+esc(g[1])+'</span>'}).join('')+'</div></div></div>'+
+   '<div class="card"><h3>Seu resumo</h3><p class="small muted">Conte a história com suas palavras, em inglês, em 3 a 5 frases. Sem olhar o texto, se puder.'+(r?' Última nota: <b>'+r.score+'/10</b>.':'')+'</p>'+
+    '<textarea id="sum" placeholder="Write your summary here…"></textarea>'+
+    '<div class="row"><button class="btn" data-act="mic" id="micbtn">🎤 Falar</button><button class="btn" data-act="freesum">Conferir grátis</button><button class="btn primary" data-act="eval" id="evbtn">Validar com Claude</button></div><div id="evres"></div></div>';
+  drawEval();
+}
+function drawEval(){
+  var el=$('#evres');if(!el||!lastEval||lastEval.id!==openStory)return;
+  var e=lastEval.r;
+  el.innerHTML='<div class="fb"><div class="row" style="justify-content:space-between"><div><div class="label">Nota</div><div class="score">'+esc(e.score)+'<span class="muted" style="font-size:1rem">/10</span></div></div><div style="flex:1 1 220px">'+esc(e.verdict)+'</div></div>'+
+   (arr(e.covered).length?'<div><h4>Você contou certo</h4><ul>'+arr(e.covered).map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>':'')+
+   (arr(e.missing).length?'<div><h4>Faltou</h4><ul>'+arr(e.missing).map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>':'')+
+   (arr(e.wrong).length?'<div><h4>Não bate com a história</h4><ul>'+arr(e.wrong).map(function(x){return '<li><del>'+esc(x.said)+'</del> '+esc(x.fact)+'</li>'}).join('')+'</ul></div>':'')+
+   (arr(e.language).length?'<div><h4>Inglês para corrigir</h4><div style="display:flex;flex-direction:column;gap:6px">'+arr(e.language).map(function(m){return '<div class="fix"><div><del>'+esc(m.said)+'</del> → <ins>'+esc(m.better)+'</ins></div><div class="small muted">'+esc(m.why)+'</div></div>'}).join('')+'</div></div>':'')+
+   (e.improved?'<div><h4>Versão melhorada</h4><div class="row" style="justify-content:space-between"><span style="flex:1 1 260px">'+esc(e.improved)+'</span><button class="icon" data-act="say" data-t="'+esc(e.improved)+'" aria-label="Ouvir">▶</button></div></div>':'')+'</div>';
+}
+function evalSummary(){
+  stopRec();
+  var ta=$('#sum'),text=ta.value.trim();if(!text||busy)return;
+  var st=allStories().filter(function(x){return x.id===openStory})[0];
+  busy=true;var b=$('#evbtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Conferindo…';
+  var prompt='You are an English teacher for '+LEARNER+'. Below is a short story and the learner\'s summary of it (written or dictated; ignore capitalization and punctuation).\n\nSTORY:\n'+st.text+'\n\nLEARNER SUMMARY:\n'+text+'\n\nReply with ONLY one JSON object: {"score": integer 0-10 combining accuracy of content (most weight) and clarity of English, "verdict": 1-2 encouraging sentences in Brazilian Portuguese, "covered": array of key story points the learner got right (Portuguese, short), "missing": array of important points they left out (Portuguese, short), "wrong": array of {"said": what the learner wrote that does not match the story, "fact": what the story really says, in Portuguese}, "language": array (max 4) of {"said","better","why" (Portuguese, short)} for grammar/vocabulary mistakes, "improved": the learner\'s summary rewritten correctly in simple natural English, keeping their ideas}.';
+  ask(prompt).then(function(r){
+    var sc=Math.max(0,Math.min(10,Math.round(Number(r.score)||0)));r.score=sc;
+    lastEval={id:openStory,r:r};S.stories[openStory]={score:sc,date:ymd(new Date())};today().story=true;save();render_header();
+  }).catch(function(e){toast(errMsg(e)||'Cancelado.')}).then(function(){busy=false;b.disabled=false;b.textContent='Validar com Claude';drawEval()});
+}
+function newStory(){
+  var tp=$('#stopic').value.trim()||'a day at work or on a trip',lv=$('#slevel').value;if(busy)return;
+  busy=true;var b=$('#nsbtn');b.disabled=true;b.innerHTML='<span class="spin"></span>Escrevendo…';
+  var prompt='Write a short story in simple English for '+LEARNER+', level '+lv+', about: "'+tp+'". 110 to 160 words, 3 short paragraphs, clear events, useful everyday vocabulary. Reply with ONLY one JSON object: {"title": 2-4 words, "kind": "work" or "travel", "text": the story with paragraphs separated by a blank line (\\n\\n), "gl": array of 5 [english word or phrase, Brazilian Portuguese translation], "kp": array of 4 or 5 {"pt": key plot point in Brazilian Portuguese (short), "kw": array of 2 to 4 lowercase English keywords or word stems that a correct summary would likely contain}}.';
+  ask(prompt).then(function(r){
+    if(!r||!r.text)throw {code:'invalid_json'};
+    S.custom.unshift({id:'c'+Date.now(),kind:r.kind==='work'?'work':'travel',level:lv,title:String(r.title||'New Story'),text:String(r.text),gl:arr(r.gl),kp:arr(r.kp).filter(function(p){return p&&p.pt&&arr(p.kw).length}).map(function(p){return {pt:String(p.pt),kw:arr(p.kw).map(function(w){return String(w).toLowerCase()})}})});save();
+  }).catch(function(e){toast(errMsg(e)||'Cancelado.')}).then(function(){busy=false;render()});
+}
+
+/* ---------- PROGRESSO ---------- */
+function vProgresso(){
+  var dots='',tot={talk:0,rep:0},d=new Date();d.setDate(d.getDate()-27);
+  for(var i=0;i<28;i++){var k=ymd(d);dots+='<span class="dot'+(anyActivity(S.days[k])?' on':'')+'" title="'+k+'"></span>';d.setDate(d.getDate()+1)}
+  Object.keys(S.days).forEach(function(k){tot.talk+=S.days[k].talk||0;tot.rep+=S.days[k].rep||0});
+  var sc=Object.keys(S.stories).map(function(k){return S.stories[k].score});
+  var avg=sc.length?(sc.reduce(function(a,b){return a+b},0)/sc.length).toFixed(1):'–';
+  $('#app').innerHTML='<div class="card"><h2>Seu progresso</h2><div class="stat"><div><b>'+streak()+'</b><span class="muted small">dias seguidos</span></div><div><b>'+tot.talk+'</b><span class="muted small">mensagens corrigidas</span></div><div><b>'+tot.rep+'</b><span class="muted small">frases repetidas</span></div><div><b>'+S.notebook.length+'</b><span class="muted small">no caderno</span></div><div><b>'+Object.keys(S.usage||{}).reduce(function(a,k){return a+S.usage[k]},0)+'</b><span class="muted small">chamadas ao Claude (total)</span></div><div><b>'+sc.length+'</b><span class="muted small">resumos (média '+avg+')</span></div></div></div>'+
+   '<div class="card"><div class="label">Últimos 28 dias</div><div class="dots">'+dots+'</div></div>'+
+   '<div class="notice">Seu progresso fica salvo na sua conta quando o link é aberto logado no claude.ai, e também neste aparelho.</div>';
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',function(ev){
+  var tab=ev.target.closest('#tabs button');if(tab){go(tab.dataset.v);return}
+  var el=ev.target.closest('[data-act]');if(!el)return;
+  var a=el.dataset.act;
+  if(a==='say')speak(el.dataset.t,!!el.dataset.slow);
+  else if(a==='goto'){if(el.dataset.sid)startConvo(el.dataset.sid);if(el.dataset.story)openStory=el.dataset.story;view=el.dataset.v;go(view)}
+  else if(a==='words'){today().words=true;save();render()}
+  else if(a==='scen'){startConvo(el.dataset.sid);helpRes=null;render()}
+  else if(a==='mode'){mode=el.dataset.m;helpRes=null;render()}
+  else if(a==='send')sendTurn();
+  else if(a==='help')helpMe();
+  else if(a==='use'){mode='reply';helpRes=null;render();$('#say').value=el.dataset.en;$('#say').focus()}
+  else if(a==='mic'){var t=$('#say')||$('#rep')||$('#sum');if(t)dictate(t,el)}
+  else if(a==='add'){if(addPhrase(el.dataset.en,el.dataset.pt,'')&&view==='frases')render()}
+  else if(a==='deck'){deck=el.dataset.d;practice=null;render()}
+  else if(a==='prac'){practice=deckList()[Number(el.dataset.i)];render();window.scrollTo(0,0)}
+  else if(a==='del'){S.notebook.splice(Number(el.dataset.i),1);save();render()}
+  else if(a==='check')checkRep();
+  else if(a==='gen')genPhrases();
+  else if(a==='open'){openStory=el.dataset.id;lastEval=null;render();window.scrollTo(0,0)}
+  else if(a==='back'){openStory=null;render()}
+  else if(a==='eval')evalSummary();
+  else if(a==='quick')showQuick('say','quick');
+  else if(a==='freesum')freeSummary();
+  else if(a==='newstory')newStory();
+});
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Enter'&&(ev.ctrlKey||ev.metaKey)&&ev.target.id==='say'){mode==='reply'?sendTurn():helpMe()}
+});
+try{if('speechSynthesis' in window)speechSynthesis.getVoices()}catch(e){}
+var h0=(location.hash||'').replace('#','');if(['hoje','conversar','frases','historias','progresso'].indexOf(h0)>=0)view=h0;
+render();
+
+$('#rate').addEventListener('change',function(){S.rate=Number(this.value);save();speak('This is the new speed.')});
+
+/* capacidades do Claude (chegam depois do primeiro desenho) */
+(function(){
+  if(!window.claude||!window.claude.use)return;
+  window.claude.use('sample').then(function(s){sample=s;if(!s)toast('A correção com o Claude não está disponível neste modo de abertura.')}).catch(function(){});
+  Promise.all([window.claude.use('db'),window.claude.use('user')]).then(function(r){
+    var db=r[0],user=r[1];if(!db||!user)return null;
+    return Promise.resolve(user.id()).then(function(id){
+      if(!id)return;
+      dbDoc=db.doc('data/users/'+id+'/progress');
+      return dbDoc.get().then(function(snap){
+        if(snap.exists){var d=snap.data();if(d&&(d.updated||0)>(S.updated||0)){S=Object.assign(S,JSON.parse(JSON.stringify(d)));try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}render()}}
+        else if(S.updated){save()}
+      });
+    });
+  }).catch(function(){});
+})();
+</script>
