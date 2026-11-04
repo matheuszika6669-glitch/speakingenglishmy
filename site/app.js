@@ -182,12 +182,12 @@ function vHoje() {
 }
 
 /* ---------- perfil e palavras personalizadas ---------- */
-var CATS = { ti: 'Tecnologia e TI', suporte: 'Suporte ao cliente', vendas: 'Vendas', logistica: 'Logística', financeiro: 'Financeiro', rh: 'RH', gerencia: 'Gestão', escritorio: 'Escritório',
+var CATS = { ti: 'Tecnologia e TI', hardware: 'Hardware', redes: 'Redes', seguranca: 'Segurança', cloud: 'Nuvem e infraestrutura', agil: 'Projetos e metodologia ágil', ti_verbos: 'Verbos de TI', suporte: 'Suporte ao cliente', vendas: 'Vendas', logistica: 'Logística', financeiro: 'Financeiro', rh: 'RH', gerencia: 'Gestão', escritorio: 'Escritório',
   mercado: 'Mercado', padaria: 'Padaria', almoco: 'Almoço e restaurante', transporte: 'Transporte', casa: 'Casa e rotina', saude: 'Saúde e farmácia', banco_compras: 'Banco e compras' };
 var DIA_CATS = ['mercado', 'padaria', 'almoco', 'transporte', 'casa', 'saude', 'banco_compras'];
 function categoriasPara(empresa, funcao, termos) {
   var t = (empresa + ' ' + funcao).toLowerCase(), c = [];
-  if (/dell|hp\b|lenovo|microsoft|google|ibm|apple|samsung|intel|cisco|oracle|sap\b|tecnolog|software|sistema|\bti\b|t\.i|inform[aá]tica|dev|program|engenh|dados|redes|infra|cloud|seguran[cç]a|hardware/.test(t) || termos === 'sim') c.push('ti');
+  if (/dell|hp\b|lenovo|microsoft|google|ibm|apple|samsung|intel|cisco|oracle|sap\b|tecnolog|software|sistema|\bti\b|t\.i|inform[aá]tica|dev|program|engenh|dados|redes|infra|cloud|seguran[cç]a|hardware/.test(t) || termos === 'sim') c.push('ti', 'hardware', 'redes', 'seguranca', 'cloud', 'agil', 'ti_verbos');
   if (/suporte|atendimento|help ?desk|service ?desk|sac\b|call ?center|cliente|t[eé]cnico/.test(t)) c.push('suporte');
   if (/vend|comercial|negoci|account|pr[eé].?venda|sales|representante/.test(t)) c.push('vendas');
   if (/log[ií]stic|estoque|expedi|armaz|supply|compras|entrega|transporte|almoxar/.test(t)) c.push('logistica');
@@ -213,8 +213,9 @@ async function salvarPerfil() {
   if (r.error) { box.textContent = 'Não consegui salvar: ' + r.error.message; return }
   MINE.perfil = r.data; editPerfil = false; view = 'hoje'; render();
 }
+function catsDoPerfil() { var p = MINE.perfil; return categoriasPara(p.empresa || '', p.funcao || '', p.termos_tecnicos || '') }
 function vocabPool(grupo) {
-  var cats = grupo === 'trabalho' ? MINE.perfil.categorias : DIA_CATS, vistas = {};
+  var cats = grupo === 'trabalho' ? catsDoPerfil() : DIA_CATS, vistas = {};
   MINE.vistas.forEach(function (id) { vistas[id] = 1 });
   var all = DATA.voc.filter(function (v) { return v.grupo === grupo && cats.indexOf(v.categoria) >= 0 });
   all.sort(function (a, b) { return a.ordem - b.ordem || cats.indexOf(a.categoria) - cats.indexOf(b.categoria) });
@@ -242,7 +243,7 @@ function palavrasHTML() {
     '<div class="row"><button class="linkbtn" data-act="perfil">Editar meu perfil</button><button class="linkbtn" data-act="goto" data-v="palavras">Ver todas as palavras</button></div>';
 }
 function vPalavras() {
-  var cats = MINE.perfil.categorias.concat(DIA_CATS), cur = vPalavras.cat && cats.indexOf(vPalavras.cat) >= 0 ? vPalavras.cat : cats[0];
+  var cats = catsDoPerfil().concat(DIA_CATS), cur = vPalavras.cat && cats.indexOf(vPalavras.cat) >= 0 ? vPalavras.cat : cats[0];
   vPalavras.cat = cur;
   var list = DATA.voc.filter(function (v) { return v.categoria === cur }), seen = list.filter(function (v) { return MINE.vistas.indexOf(v.id) >= 0 }).length;
   $('#app').innerHTML = '<div class="card"><h2>Palavras</h2><p class="muted small">Seu perfil: ' + esc(MINE.perfil.empresa) + ' · ' + esc(MINE.perfil.funcao) + '. As categorias do trabalho vêm primeiro.</p>' +
