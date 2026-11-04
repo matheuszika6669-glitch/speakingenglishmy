@@ -23,7 +23,7 @@ function dictate(ta,btn){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){toast(MIC_TIP);return}
   try{
-    var r=new SR();r.lang='en-US';r.interimResults=false;
+    var r=new SR();window._rec=r;r.lang='en-US';r.interimResults=false;
     r.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;ta.value=(ta.value?ta.value+' ':'')+t;btn.textContent='🎤 Falar'};
     r.onerror=function(e){btn.textContent='🎤 Falar';toast('Código do erro: '+(e&&e.error||'desconhecido')+'. '+MIC_TIP)};
     r.onend=function(){btn.textContent='🎤 Falar'};
@@ -260,7 +260,7 @@ function vFalar() {
   var body = lines.map(function (l, i) {
     if (l.quem === 'outro') return '<div class="bubble them"><div>' + esc(l.en) + '</div><div class="row"><button class="icon" data-act="say" data-t="' + esc(l.en) + '" aria-label="Ouvir">▶</button><span class="small muted">' + esc(l.pt) + '</span></div></div>';
     return '<div class="card line"><div class="label">Sua vez · diga em inglês</div><div class="pt">' + esc(l.pt) + '</div><textarea id="d' + i + '" style="min-height:56px" placeholder="Fale ou escreva em inglês…"></textarea>' +
-      '<div class="row"><button class="btn" data-act="mic" data-t="d' + i + '">🎤 Falar</button><button class="btn primary" data-act="chk" data-i="' + i + '">Conferir</button><button class="btn" data-act="rev" data-i="' + i + '">Ver modelo</button></div><div id="r' + i + '"></div></div>';
+      '<div class="row"><button class="btn" data-act="mic" data-t="d' + i + '">🎤 Falar</button><button class="btn" data-act="clr" data-t="d' + i + '">Limpar texto</button><button class="btn primary" data-act="chk" data-i="' + i + '">Conferir</button><button class="btn" data-act="rev" data-i="' + i + '">Ver modelo</button></div><div id="r' + i + '"></div></div>';
   }).join('');
   $('#app').innerHTML = '<div class="card"><div class="label">Escolha a situação</div>' + chips(DATA.sit, sitId, 'sit', sitLabel) + '<p class="small muted">Você conversa com <b>' + esc(sit.papel) + '</b>. Ouça a fala dele (▶) e responda em inglês, olhando só a dica em português. Depois confira.</p></div>' +
     '<div class="log">' + body + '</div>';
@@ -286,7 +286,7 @@ function vFrases() {
   if (practice) pr = '<div class="card"><div class="label">Pratique esta frase</div><div class="big">' + esc(practice.en) + '</div><div class="muted">' + esc(practice.pt) + '</div>' +
     '<div class="row"><button class="btn" data-act="say" data-t="' + esc(practice.en) + '">▶ Ouvir</button><button class="btn" data-act="say" data-slow="1" data-t="' + esc(practice.en) + '">🐢 Devagar</button></div>' +
     '<label class="label" for="rep">Diga em voz alta e escreva (ou dite) o que você disse</label><textarea id="rep" style="min-height:64px"></textarea>' +
-    '<div class="row"><button class="btn" data-act="mic" data-t="rep">🎤 Falar</button><button class="btn primary" data-act="rcheck">Conferir</button></div><div id="repres"></div></div>';
+    '<div class="row"><button class="btn" data-act="mic" data-t="rep">🎤 Falar</button><button class="btn" data-act="clr" data-t="rep">Limpar texto</button><button class="btn primary" data-act="rcheck">Conferir</button></div><div id="repres"></div></div>';
   var rows = list.map(function (p, i) { return '<div class="phr"><div><div class="en">' + esc(p.en) + '</div><div class="small muted">' + esc(p.pt) + '</div></div><span class="row"><button class="icon" data-act="say" data-t="' + esc(p.en) + '" aria-label="Ouvir">▶</button><button class="btn" data-act="prac" data-i="' + i + '">Praticar</button><button class="icon" data-act="add" data-en="' + esc(p.en) + '" data-pt="' + esc(p.pt) + '" aria-label="Salvar no caderno">＋</button></span></div>' }).join('');
   $('#app').innerHTML = '<div class="card"><div class="label">Situação</div>' + chips(DATA.sit, sitId, 'sit', sitLabel) + '</div>' + pr + '<div class="card"><div style="display:flex;flex-direction:column;gap:8px">' + rows + '</div></div>';
   vFrases.list = list;
@@ -304,7 +304,7 @@ function vEscrever() {
   var past = MINE.escritas.filter(function (e) { return e.tarefa_id === tarId }).slice(0, 3);
   $('#app').innerHTML = '<div class="card"><div class="label">Tarefa de escrita</div>' + chips(DATA.tar, tarId, 'tar', function (s) { return (s.tipo === 'work' ? '💼 ' : '✈️ ') + esc(s.titulo) }) + '</div>' +
     '<div class="card"><h3>' + esc(t.titulo) + '</h3><p>' + esc(t.instrucao_pt) + '</p><label class="label" for="txt">Seu texto em inglês</label><textarea id="txt" style="min-height:150px" placeholder="Write here…"></textarea>' +
-    '<div class="row"><button class="btn" data-act="mic" data-t="txt">🎤 Ditar</button><button class="btn" data-act="quick">Checagem rápida</button><button class="btn primary" data-act="wcheck">Conferir e salvar</button></div><div id="wres"></div></div>' +
+    '<div class="row"><button class="btn" data-act="mic" data-t="txt">🎤 Ditar</button><button class="btn" data-act="clr" data-t="txt">Limpar texto</button><button class="btn" data-act="quick">Checagem rápida</button><button class="btn primary" data-act="wcheck">Conferir e salvar</button></div><div id="wres"></div></div>' +
     (past.length ? '<div class="card"><div class="label">Suas últimas tentativas</div>' + past.map(function (e) { return '<div class="phr"><div class="small">' + esc(e.texto.slice(0, 160)) + (e.texto.length > 160 ? '…' : '') + '</div><span class="tag">' + (e.pct == null ? '' : e.pct + '%') + ' · ' + local(e).slice(5) + '</span></div>' }).join('') + '</div>' : '');
 }
 async function wCheck() {
@@ -329,7 +329,7 @@ function readStory(st) {
   $('#app').innerHTML = '<div class="row"><button class="btn" data-act="back">← Biblioteca</button></div><div class="card"><div class="label">' + (st.tipo === 'work' ? 'Trabalho' : 'Viagem') + ' · nível ' + esc(st.nivel) + '</div><h2>' + esc(st.titulo) + '</h2>' +
     '<div class="row"><button class="btn" data-act="say" data-t="' + esc(st.texto.replace(/\n+/g, ' ')) + '">▶ Ouvir</button><button class="btn" data-act="say" data-slow="1" data-t="' + esc(st.texto.replace(/\n+/g, ' ')) + '">🐢 Devagar</button></div><div class="story">' + paras + '</div>' +
     '<div><div class="label">Vocabulário</div><div class="gl" style="margin-top:6px">' + st.glossario.map(function (g) { return '<span>' + esc(g.en) + ' = ' + esc(g.pt) + '</span>' }).join('') + '</div></div></div>' +
-    '<div class="card"><h3>Seu resumo</h3><p class="small muted">Conte a história com suas palavras, em inglês, em 3 a 5 frases.</p><textarea id="sum" placeholder="Write your summary here…"></textarea><div class="row"><button class="btn" data-act="mic" data-t="sum">🎤 Falar</button><button class="btn primary" data-act="scheck">Conferir e salvar</button></div><div id="evres"></div></div>';
+    '<div class="card"><h3>Seu resumo</h3><p class="small muted">Conte a história com suas palavras, em inglês, em 3 a 5 frases.</p><textarea id="sum" placeholder="Write your summary here…"></textarea><div class="row"><button class="btn" data-act="mic" data-t="sum">🎤 Falar</button><button class="btn" data-act="clr" data-t="sum">Limpar texto</button><button class="btn primary" data-act="scheck">Conferir e salvar</button></div><div id="evres"></div></div>';
 }
 async function sCheck() {
   var text = $('#sum').value.trim(); if (!text) { toast('Escreva o resumo primeiro.'); return }
@@ -373,6 +373,13 @@ document.addEventListener('click', async function (ev) {
   else if (a === 'goto') go(el.dataset.v);
   else if (a === 'sit') { sitId = el.dataset.id; practice = null; render() }
   else if (a === 'tar') { tarId = el.dataset.id; render() }
+  else if (a === 'clr') {
+    try { if (window._rec) window._rec.abort() } catch (e) {}
+    Array.prototype.forEach.call(document.querySelectorAll('[data-act=mic]'), function (b) { b.textContent = b.dataset.t === 'txt' ? '🎤 Ditar' : '🎤 Falar' });
+    var tx2 = $('#' + el.dataset.t), box2 = { rep: '#repres', txt: '#wres', sum: '#evres' }[el.dataset.t] || (el.dataset.t.charAt(0) === 'd' ? '#r' + el.dataset.t.slice(1) : '');
+    if (tx2) { tx2.value = ''; tx2.focus() }
+    if (box2 && $(box2)) $(box2).innerHTML = '';
+  }
   else if (a === 'mic') { var t = $('#' + el.dataset.t); if (t) dictate(t, el) }
   else if (a === 'chk') chkLine(Number(el.dataset.i));
   else if (a === 'rev') revLine(Number(el.dataset.i));
