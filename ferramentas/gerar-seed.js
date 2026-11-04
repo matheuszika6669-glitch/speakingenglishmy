@@ -33,6 +33,11 @@ const TAREFAS = [
  ['e10','travel','Pedir dicas de um lugar','Escreva para um amigo que mora em Londres: você vai visitar a cidade por 5 dias e quer dicas de passeios e restaurantes.',"Hi Tom, I'm going to visit London next month for five days. Do you have any tips for places to see? I'd also like to know a good restaurant that isn't too expensive. Maybe we can meet for dinner one night. Let me know! Thanks.",[['Disse que vai visitar',['london','visit','going to']],['Disse a duração',['five','5','days']],['Pediu dicas de passeios',['tips','recommend','places','suggest']],['Falou de restaurante ou encontro',['restaurant','dinner','meet']]],'A2']
 ];
 
+// Conteúdo extra: mais frases nas situações existentes + situações novas (ver conteudo-extra.js)
+const EXTRA = require('./conteudo-extra.js');
+SCEN.forEach(s => { s.phrases = s.phrases.concat(EXTRA.EXTRA_FRASES[s.id] || []) });
+EXTRA.NOVAS.forEach(n => { SCEN.push({ id: n.id, kind: n.kind, title: n.title, role: n.role, opener: n.opener, phrases: n.phrases, words: n.words }); DIAL[n.id] = n.dial });
+
 const dq = s => { s = String(s); if (s.includes('$q$')) throw new Error('texto contém $q$'); return '$q$' + s + '$q$'; };
 const js_ = o => dq(JSON.stringify(o)) + '::jsonb';
 let sql = '-- Gerado por ferramentas/gerar-seed.js. Pode rodar de novo: atualiza o conteúdo sem duplicar.\n';
