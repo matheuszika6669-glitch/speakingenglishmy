@@ -182,16 +182,16 @@ function vHoje() {
 }
 
 /* ---------- perfil e palavras personalizadas ---------- */
-var CATS = { ti: 'Tecnologia e TI', hardware: 'Hardware', redes: 'Redes', seguranca: 'Segurança', cloud: 'Nuvem e infraestrutura', agil: 'Projetos e metodologia ágil', ti_verbos: 'Verbos de TI', suporte: 'Suporte ao cliente', vendas: 'Vendas', logistica: 'Logística', financeiro: 'Financeiro', rh: 'RH', gerencia: 'Gestão', escritorio: 'Escritório',
+var CATS = { ti: 'Tecnologia e TI', hardware: 'Hardware', redes: 'Redes', seguranca: 'Segurança', cloud: 'Nuvem e infraestrutura', agil: 'Projetos e metodologia ágil', ti_verbos: 'Verbos de TI', vendas_prospeccao: 'Vendas: prospecção', vendas_negociacao: 'Vendas: negociação', vendas_posvenda: 'Vendas: pós-venda', contabilidade: 'Contabilidade', contas: 'Contas a pagar e receber', bancos_invest: 'Bancos e investimentos', suporte: 'Suporte ao cliente', vendas: 'Vendas', logistica: 'Logística', financeiro: 'Financeiro', rh: 'RH', gerencia: 'Gestão', escritorio: 'Escritório',
   mercado: 'Mercado', padaria: 'Padaria', almoco: 'Almoço e restaurante', transporte: 'Transporte', casa: 'Casa e rotina', saude: 'Saúde e farmácia', banco_compras: 'Banco e compras' };
 var DIA_CATS = ['mercado', 'padaria', 'almoco', 'transporte', 'casa', 'saude', 'banco_compras'];
 function categoriasPara(empresa, funcao, termos) {
   var t = (empresa + ' ' + funcao).toLowerCase(), c = [];
   if (/dell|hp\b|lenovo|microsoft|google|ibm|apple|samsung|intel|cisco|oracle|sap\b|tecnolog|software|sistema|\bti\b|t\.i|inform[aá]tica|dev|program|engenh|dados|redes|infra|cloud|seguran[cç]a|hardware/.test(t) || termos === 'sim') c.push('ti', 'hardware', 'redes', 'seguranca', 'cloud', 'agil', 'ti_verbos');
   if (/suporte|atendimento|help ?desk|service ?desk|sac\b|call ?center|cliente|t[eé]cnico/.test(t)) c.push('suporte');
-  if (/vend|comercial|negoci|account|pr[eé].?venda|sales|representante/.test(t)) c.push('vendas');
+  if (/vend|comercial|negoci|account|pr[eé].?venda|sales|representante/.test(t)) c.push('vendas', 'vendas_prospeccao', 'vendas_negociacao', 'vendas_posvenda');
   if (/log[ií]stic|estoque|expedi|armaz|supply|compras|entrega|transporte|almoxar/.test(t)) c.push('logistica');
-  if (/financ|cont[aá]b|fatur|cobran|fiscal|tesour|controladoria/.test(t)) c.push('financeiro');
+  if (/financ|cont[aá]b|fatur|cobran|fiscal|tesour|controladoria|banc[aá]rio|banco\b|investiment/.test(t)) c.push('financeiro', 'contabilidade', 'contas', 'bancos_invest');
   if (/\brh\b|recursos humanos|recrut|people|gente|talent|departamento pessoal/.test(t)) c.push('rh');
   if (/gerente|coordenador|l[ií]der|diretor|supervisor|gestor|manager|lead|chefe/.test(t)) c.push('gerencia');
   c.push('escritorio');
