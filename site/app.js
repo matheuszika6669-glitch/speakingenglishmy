@@ -84,6 +84,7 @@ var CONFIG_OK = /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SUPABASE_URL) && SUPA
 var sb = CONFIG_OK ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'fala-ingles-auth' } }) : null;
 var S = { rate: 0 };
 try { S.rate = Number(localStorage.getItem('fi-rate') || 0) || 0 } catch (e) {}
+var editPerfil = false;
 var user = null, DATA = null, MINE = null, view = 'hoje', sitId = null, tarId = null, hisId = null, practice = null, loadErr = '';
 
 function pick(a) { return a.length ? a[dayNum() % a.length] : null }
@@ -106,11 +107,14 @@ async function loadAll() {
     sb.from('fi_falas').select('*').order('criado_em', { ascending: false }).limit(1000),
     sb.from('fi_escritas').select('*').order('criado_em', { ascending: false }).limit(500),
     sb.from('fi_resumos').select('*').order('criado_em', { ascending: false }).limit(500),
-    sb.from('fi_caderno').select('*').order('criado_em', { ascending: false })]);
+    sb.from('fi_caderno').select('*').order('criado_em', { ascending: false }),
+    sb.from('fi_vocab').select('*').order('ordem', { ascending: true }),
+    sb.from('fi_perfil').select('*').maybeSingle(),
+    sb.from('fi_vocab_vistas').select('vocab_id')]);
   var bad = r.filter(function (x) { return x.error })[0];
   if (bad) throw bad.error;
-  DATA = { sit: r[0].data, frases: r[1].data, pal: r[2].data, dial: r[3].data, tar: r[4].data, his: r[5].data };
-  MINE = { falas: r[6].data, escritas: r[7].data, resumos: r[8].data, caderno: r[9].data };
+  DATA = { sit: r[0].data, frases: r[1].data, pal: r[2].data, dial: r[3].data, tar: r[4].data, his: r[5].data, voc: r[10].data };
+  MINE = { falas: r[6].data, escritas: r[7].data, resumos: r[8].data, caderno: r[9].data, perfil: r[11].data, vistas: r[12].data.map(function (x) { return x.vocab_id }) };
 }
 async function boot() {
   DATA = null; MINE = null; loadErr = '';
@@ -135,17 +139,18 @@ function render() {
   Array.prototype.forEach.call($('#tabs').children, function (b) { if (b.dataset.v === view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') });
   $('#rate').value = String(S.rate || 0);
   if (!logged) return vLogin();
-  $('#who').textContent = user.email || '';
+  $('#who').textContent = /@example\.com$/.test(user.email || '') ? user.email.split('@')[0] : (user.email || '');
   if (loadErr) { $('#app').innerHTML = '<div class="notice warn">' + esc(loadErr) + '</div>'; return }
   if (!DATA) { $('#app').innerHTML = '<div class="notice"><span class="spin"></span>Carregando…</div>'; return }
   render_header();
-  ({ hoje: vHoje, falar: vFalar, frases: vFrases, escrever: vEscrever, historias: vHistorias, caderno: vCaderno, progresso: vProgresso })[view]();
+  if (!MINE.perfil || editPerfil) { $('#tabs').hidden = true; return vPerfil() }
+  ({ hoje: vHoje, palavras: vPalavras, falar: vFalar, frases: vFrases, escrever: vEscrever, historias: vHistorias, caderno: vCaderno, progresso: vProgresso })[view]();
 }
 function go(v) { view = v; practice = null; try { history.replaceState(null, '', '#' + v) } catch (e) {} render(); window.scrollTo(0, 0) }
 
 function vLogin() {
   $('#app').innerHTML = '<form class="card login" id="loginform"><h2>Entrar</h2><p class="muted small">Use a conta criada para você no Supabase do Fala Inglês.</p>' +
-    '<label class="label" for="em">E-mail</label><input type="text" id="em" autocomplete="username" inputmode="email">' +
+    '<label class="label" for="em">Usuário ou e-mail</label><input type="text" id="em" autocomplete="username" autocapitalize="none">' +
     '<label class="label" for="pw">Senha</label><input type="password" id="pw" autocomplete="current-password" style="width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px">' +
     '<div class="err" id="loginerr"></div><button class="btn primary" type="submit">Entrar</button></form>';
 }
@@ -171,9 +176,78 @@ function vHoje() {
     gate('GATE 2', d[1], 'Repetir 5 frases', 'Ouça, fale e confira. Já fez ' + Math.min(nFrases, 5) + '/5.', 'Praticar', 'frases') +
     gate('GATE 3', d[2], 'Escrever: ' + esc(tar ? tar.titulo : '—'), 'Escreva e compare com o modelo.', 'Escrever', 'escrever') +
     gate('GATE 4', d[3], 'História: ' + esc(his ? his.titulo : '—'), 'Leia e escreva um resumo.', 'Ler', 'historias') +
-    '</ul><details class="words" open><summary>Palavras de hoje</summary><div class="wlist">' + wl + '</div></details></section>' +
+    '</ul></section>' + palavrasHTML() +
     '<div class="notice">Nada aqui usa créditos do Claude. A conferência compara o que você disse ou escreveu com o modelo do banco. Ela não ouve a pronúncia e não entende o sentido: use o modelo para se corrigir.</div>';
   if (!sitId) sitId = sit.id; if (!tarId && tar) tarId = tar.id; if (!hisId && his) hisId = his.id;
+}
+
+/* ---------- perfil e palavras personalizadas ---------- */
+var CATS = { ti: 'Tecnologia e TI', suporte: 'Suporte ao cliente', vendas: 'Vendas', logistica: 'Logística', financeiro: 'Financeiro', rh: 'RH', gerencia: 'Gestão', escritorio: 'Escritório',
+  mercado: 'Mercado', padaria: 'Padaria', almoco: 'Almoço e restaurante', transporte: 'Transporte', casa: 'Casa e rotina', saude: 'Saúde e farmácia', banco_compras: 'Banco e compras' };
+var DIA_CATS = ['mercado', 'padaria', 'almoco', 'transporte', 'casa', 'saude', 'banco_compras'];
+function categoriasPara(empresa, funcao, termos) {
+  var t = (empresa + ' ' + funcao).toLowerCase(), c = [];
+  if (/dell|hp\b|lenovo|microsoft|google|ibm|apple|samsung|intel|cisco|oracle|sap\b|tecnolog|software|sistema|\bti\b|t\.i|inform[aá]tica|dev|program|engenh|dados|redes|infra|cloud|seguran[cç]a|hardware/.test(t) || termos === 'sim') c.push('ti');
+  if (/suporte|atendimento|help ?desk|service ?desk|sac\b|call ?center|cliente|t[eé]cnico/.test(t)) c.push('suporte');
+  if (/vend|comercial|negoci|account|pr[eé].?venda|sales|representante/.test(t)) c.push('vendas');
+  if (/log[ií]stic|estoque|expedi|armaz|supply|compras|entrega|transporte|almoxar/.test(t)) c.push('logistica');
+  if (/financ|cont[aá]b|fatur|cobran|fiscal|tesour|controladoria/.test(t)) c.push('financeiro');
+  if (/\brh\b|recursos humanos|recrut|people|gente|talent|departamento pessoal/.test(t)) c.push('rh');
+  if (/gerente|coordenador|l[ií]der|diretor|supervisor|gestor|manager|lead|chefe/.test(t)) c.push('gerencia');
+  c.push('escritorio');
+  return c;
+}
+function vPerfil() {
+  var p = MINE.perfil || {}, tt = p.termos_tecnicos || '';
+  var opt = function (label, val) { return '<label class="chip" style="display:inline-flex;gap:6px;align-items:center"><input type="radio" name="p_tec" value="' + val + '"' + (tt === val ? ' checked' : '') + '> ' + label + '</label>' };
+  $('#app').innerHTML = '<form class="card login" id="perfilform" style="max-width:520px"><h2>' + (MINE.perfil ? 'Seu perfil' : 'Vamos começar') + '</h2><p class="muted small">Com 3 respostas rápidas eu escolho as palavras que você mais usa no trabalho e no dia a dia.</p>' +
+    '<label class="label" for="p_emp">Onde trabalha?</label><input type="text" id="p_emp" placeholder="Ex.: Dell" value="' + esc(p.empresa || '') + '">' +
+    '<div class="label">Utiliza mais termos técnicos em inglês no cotidiano?</div><div class="row">' + opt('Sim', 'sim') + opt('Não', 'nao') + opt('Às vezes', 'as_vezes') + '</div>' +
+    '<label class="label" for="p_fun">Função no trabalho?</label><input type="text" id="p_fun" placeholder="Ex.: analista de suporte" value="' + esc(p.funcao || '') + '">' +
+    '<div class="err" id="perfilerr"></div><div class="row"><button class="btn primary" type="submit">Salvar e começar</button>' + (MINE.perfil ? '<button class="btn" type="button" data-act="cancelperfil">Cancelar</button>' : '') + '</div></form>';
+}
+async function salvarPerfil() {
+  var emp = $('#p_emp').value.trim(), fun = $('#p_fun').value.trim(), tec = ($('input[name=p_tec]:checked') || {}).value || '', box = $('#perfilerr');
+  if (!emp || !fun || !tec) { box.textContent = 'Responda as 3 perguntas para continuar.'; return }
+  var r = await sb.from('fi_perfil').upsert({ user_id: user.id, empresa: emp, funcao: fun, termos_tecnicos: tec, categorias: categoriasPara(emp, fun, tec), atualizado_em: new Date().toISOString() }).select().single();
+  if (r.error) { box.textContent = 'Não consegui salvar: ' + r.error.message; return }
+  MINE.perfil = r.data; editPerfil = false; view = 'hoje'; render();
+}
+function vocabPool(grupo) {
+  var cats = grupo === 'trabalho' ? MINE.perfil.categorias : DIA_CATS, vistas = {};
+  MINE.vistas.forEach(function (id) { vistas[id] = 1 });
+  var all = DATA.voc.filter(function (v) { return v.grupo === grupo && cats.indexOf(v.categoria) >= 0 });
+  all.sort(function (a, b) { return a.ordem - b.ordem || cats.indexOf(a.categoria) - cats.indexOf(b.categoria) });
+  var novas = all.filter(function (v) { return !vistas[v.id] });
+  return novas.length >= 6 ? novas : all;
+}
+function pickDia(pool) {
+  var n = pool.length, out = [];
+  if (!n) return out;
+  var start = (dayNum() * 6) % n;
+  for (var i = 0; i < Math.min(6, n); i++) out.push(pool[(start + i) % n]);
+  return out;
+}
+function vocabRow(v) {
+  var seen = MINE.vistas.indexOf(v.id) >= 0;
+  return '<div class="phr"><div style="min-width:0"><div class="en">' + esc(v.en) + ' <span class="tag">' + esc(CATS[v.categoria] || v.categoria) + '</span></div><div class="small">' + esc(v.pt) + '</div>' +
+    (v.ex_en ? '<div class="small muted" style="margin-top:4px"><i>' + esc(v.ex_en) + '</i><br>' + esc(v.ex_pt || '') + '</div>' : '') + '</div>' +
+    '<span class="row"><button class="icon" data-act="say" data-t="' + esc(v.en) + '" aria-label="Ouvir a palavra">▶</button>' + (v.ex_en ? '<button class="icon" data-act="say" data-t="' + esc(v.ex_en) + '" aria-label="Ouvir a frase de exemplo">▶▶</button>' : '') +
+    '<button class="btn' + (seen ? '' : ' primary') + '" data-act="vseen" data-id="' + v.id + '"' + (seen ? ' disabled' : '') + '>' + (seen ? '✓ Aprendi' : 'Aprendi') + '</button></span></div>';
+}
+function palavrasHTML() {
+  var p = MINE.perfil, w = pickDia(vocabPool('trabalho')), d = pickDia(vocabPool('dia'));
+  return '<div class="card"><div class="label">Palavras de trabalho de hoje · ' + esc(p.empresa) + ' · ' + esc(p.funcao) + '</div><div style="display:flex;flex-direction:column;gap:8px">' + w.map(vocabRow).join('') + '</div></div>' +
+    '<div class="card"><div class="label">Palavras do dia a dia de hoje · mercado, padaria, almoço e mais</div><div style="display:flex;flex-direction:column;gap:8px">' + d.map(vocabRow).join('') + '</div></div>' +
+    '<div class="row"><button class="linkbtn" data-act="perfil">Editar meu perfil</button><button class="linkbtn" data-act="goto" data-v="palavras">Ver todas as palavras</button></div>';
+}
+function vPalavras() {
+  var cats = MINE.perfil.categorias.concat(DIA_CATS), cur = vPalavras.cat && cats.indexOf(vPalavras.cat) >= 0 ? vPalavras.cat : cats[0];
+  vPalavras.cat = cur;
+  var list = DATA.voc.filter(function (v) { return v.categoria === cur }), seen = list.filter(function (v) { return MINE.vistas.indexOf(v.id) >= 0 }).length;
+  $('#app').innerHTML = '<div class="card"><h2>Palavras</h2><p class="muted small">Seu perfil: ' + esc(MINE.perfil.empresa) + ' · ' + esc(MINE.perfil.funcao) + '. As categorias do trabalho vêm primeiro.</p>' +
+    '<div class="row">' + cats.map(function (c) { return '<button class="chip" data-act="vcat" data-id="' + c + '" aria-pressed="' + (c === cur) + '">' + esc(CATS[c] || c) + '</button>' }).join('') + '</div></div>' +
+    '<div class="card"><div class="label">' + esc(CATS[cur] || cur) + ' · ' + seen + '/' + list.length + ' aprendidas</div><div style="display:flex;flex-direction:column;gap:8px">' + list.map(vocabRow).join('') + '</div></div>';
 }
 
 function chips(list, cur, act, label) { return '<div class="row">' + list.map(function (s) { return '<button class="chip" data-act="' + act + '" data-id="' + esc(s.id) + '" aria-pressed="' + (s.id === cur) + '">' + label(s) + '</button>' }).join('') + '</div>' }
@@ -277,15 +351,17 @@ function vProgresso() {
   for (var i = 0; i < 28; i++) { var k = ymd(d); dots += '<span class="dot' + (s[k] ? ' on' : '') + '" title="' + k + '"></span>'; d.setDate(d.getDate() + 1) }
   var f = MINE.falas, avg = f.length ? Math.round(f.reduce(function (a, x) { return a + x.pct }, 0) / f.length) : 0;
   var last = f.slice(0, 8).map(function (x) { return '<div class="phr"><div class="small">' + esc(x.alvo) + '<div class="muted">você: ' + esc(x.dito) + '</div></div><span class="tag">' + x.pct + '%</span></div>' }).join('');
-  $('#app').innerHTML = '<div class="card"><h2>Seu progresso</h2><div class="stat"><div><b>' + streak() + '</b><span class="muted small">dias seguidos</span></div><div><b>' + f.length + '</b><span class="muted small">falas registradas (média ' + avg + '%)</span></div><div><b>' + MINE.escritas.length + '</b><span class="muted small">textos escritos</span></div><div><b>' + MINE.resumos.length + '</b><span class="muted small">resumos</span></div><div><b>' + MINE.caderno.length + '</b><span class="muted small">no caderno</span></div></div></div>' +
+  $('#app').innerHTML = '<div class="card"><h2>Seu progresso</h2><div class="stat"><div><b>' + streak() + '</b><span class="muted small">dias seguidos</span></div><div><b>' + f.length + '</b><span class="muted small">falas registradas (média ' + avg + '%)</span></div><div><b>' + MINE.escritas.length + '</b><span class="muted small">textos escritos</span></div><div><b>' + MINE.resumos.length + '</b><span class="muted small">resumos</span></div><div><b>' + MINE.caderno.length + '</b><span class="muted small">no caderno</span></div><div><b>' + MINE.vistas.length + '</b><span class="muted small">palavras aprendidas</span></div></div></div>' +
     '<div class="card"><div class="label">Últimos 28 dias</div><div class="dots">' + dots + '</div></div>' + (last ? '<div class="card"><div class="label">Últimas falas</div>' + last + '</div>' : '');
 }
 
 /* ---------- eventos ---------- */
 document.addEventListener('submit', async function (ev) {
+  if (ev.target.id === 'perfilform') { ev.preventDefault(); salvarPerfil(); return }
   if (ev.target.id !== 'loginform') return;
   ev.preventDefault();
   var e = $('#em').value.trim(), p = $('#pw').value, box = $('#loginerr'); box.textContent = '';
+  if (e.indexOf('@') < 0) e = e.toLowerCase() + '@example.com';
   var r = await sb.auth.signInWithPassword({ email: e, password: p });
   if (r.error) box.textContent = 'Não foi possível entrar: ' + (/invalid/i.test(r.error.message) ? 'e-mail ou senha incorretos.' : r.error.message);
 });
@@ -306,6 +382,13 @@ document.addEventListener('click', async function (ev) {
   else if (a === 'wcheck') wCheck();
   else if (a === 'open') { hisId = el.dataset.id; vHistorias.open = true; render(); window.scrollTo(0, 0) }
   else if (a === 'back') { vHistorias.open = false; render() }
+  else if (a === 'perfil') { editPerfil = true; render() }
+  else if (a === 'cancelperfil') { editPerfil = false; render() }
+  else if (a === 'vcat') { vPalavras.cat = el.dataset.id; render() }
+  else if (a === 'vseen') {
+    var vid = Number(el.dataset.id), rv = await sb.from('fi_vocab_vistas').insert({ vocab_id: vid });
+    if (rv.error && !/duplicate|unique/i.test(rv.error.message)) toast('Não consegui salvar: ' + rv.error.message); else { if (MINE.vistas.indexOf(vid) < 0) MINE.vistas.push(vid); render() }
+  }
   else if (a === 'scheck') sCheck();
   else if (a === 'add') {
     var r = await sb.from('fi_caderno').insert({ en: el.dataset.en, pt: el.dataset.pt }).select().single();
@@ -324,7 +407,7 @@ document.addEventListener('click', async function (ev) {
 $('#rate').addEventListener('change', function () { S.rate = Number(this.value); try { localStorage.setItem('fi-rate', String(S.rate)) } catch (e) {} speak('This is the new speed.') });
 $('#logout').addEventListener('click', async function () { await sb.auth.signOut() });
 try { if ('speechSynthesis' in window) speechSynthesis.getVoices() } catch (e) {}
-var h0 = (location.hash || '').replace('#', ''); if (['hoje', 'falar', 'frases', 'escrever', 'historias', 'caderno', 'progresso'].indexOf(h0) >= 0) view = h0;
+var h0 = (location.hash || '').replace('#', ''); if (['hoje', 'palavras', 'falar', 'frases', 'escrever', 'historias', 'caderno', 'progresso'].indexOf(h0) >= 0) view = h0;
 if (!CONFIG_OK) { $('#app').innerHTML = '<div class="notice warn">Falta configurar o Supabase: abra site/config.js e cole a Project URL e a chave Publishable do projeto do Fala Inglês.</div>'; } else sb.auth.getSession().then(function (r) {
   user = r.data.session ? r.data.session.user : null;
   sb.auth.onAuthStateChange(function (ev, s) { var u = s ? s.user : null; if ((u && u.id) !== (user && user.id)) { user = u; boot() } });

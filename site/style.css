@@ -128,3 +128,5 @@ ins{color:var(--good);text-decoration:none;font-weight:700}
 .line .pt{font-weight:700}
 .tag{font-family:var(--f-mono);font-size:.7rem;border-radius:6px;padding:2px 7px;background:var(--surface2);color:var(--muted)}
 .hint{background:var(--accent-soft);border-radius:10px;padding:10px 12px}
+
+[hidden]{display:none!important}
