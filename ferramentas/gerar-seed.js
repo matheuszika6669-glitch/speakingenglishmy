@@ -38,6 +38,9 @@ const EXTRA = require('./conteudo-extra.js');
 SCEN.forEach(s => { s.phrases = s.phrases.concat(EXTRA.EXTRA_FRASES[s.id] || []) });
 EXTRA.NOVAS.forEach(n => { SCEN.push({ id: n.id, kind: n.kind, title: n.title, role: n.role, opener: n.opener, phrases: n.phrases, words: n.words }); DIAL[n.id] = n.dial });
 
+// Histórias extra (adaptadas de matérias do VOA em domínio público, reescritas em inglês simples)
+require('./historias-extra.js').forEach(h => { STORIES.push({ id: h.id, kind: h.kind, level: h.level, title: h.title, text: h.text, gl: h.gl }); KP[h.id] = h.kp });
+
 const dq = s => { s = String(s); if (s.includes('$q$')) throw new Error('texto contém $q$'); return '$q$' + s + '$q$'; };
 const js_ = o => dq(JSON.stringify(o)) + '::jsonb';
 let sql = '-- Gerado por ferramentas/gerar-seed.js. Pode rodar de novo: atualiza o conteúdo sem duplicar.\n';
